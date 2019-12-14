@@ -1,0 +1,17 @@
+# Config file for the rFBP package
+# It defines the following variables
+#  DAG_INCLUDE_DIRS - include directories for rFBP
+#  DAG_LIBRARIES    - libraries to link against
+
+# Compute paths
+get_filename_component(DAG_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(DAG_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
+list(APPEND CMAKE_MODULE_PATH "${DAG_CMAKE_DIR}")
+
+include(CMakeFindDependencyMacro)
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+include("${DAG_CMAKE_DIR}/DAGTargets.cmake")
+
+# These are IMPORTED targets created by DAGTargets.cmake
+set(DAG_LIBRARIES DAGlib)

@@ -1,0 +1,48 @@
+image: Visual Studio 2017
+clone_folder: c:\projects\dag
+configuration: Release
+
+environment:
+    WORKSPACE: C:\projects
+    matrix:
+    - platform: Win32
+      COMPILER: vs
+      MSVC_SETUP_ARG: x86
+      PYTHON: "C:\\Python36"
+      PYTHON_VERSION: "3.6.3"
+      PYTHON_ARCH: "32"
+      MINICONDA: "C:\\Miniconda36"
+    - platform: Win64
+      COMPILER: vs
+      MSVC_SETUP_ARG: x64
+      PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "3.6.3"
+      PYTHON_ARCH: "64"
+      MINICONDA: "C:\\Miniconda36-x64"
+
+install:
+  - cinst -y ninja
+  - SET "PATH=C:\Program Files\CMake\bin;%PATH%"
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x86
+  - git submodule -q update --init --recursive
+  - cd %WORKSPACE%\
+  ############################################################################
+  # Install a recent CMake
+  ############################################################################
+  - set CMAKE_URL="https://cmake.org/files/v3.12/cmake-3.12.1-win64-x64.zip"
+  - appveyor DownloadFile %CMAKE_URL% -FileName cmake.zip
+  - 7z x cmake.zip -oC:\projects\deps > nul
+  - move C:\projects\deps\cmake-* C:\projects\deps\cmake # Move to a version-agnostic directory
+  - set PATH=C:\projects\deps\cmake\bin;%PATH%
+  - cmake --version
+
+
+before_build:
+  - cd %WORKSPACE%\dag
+  - mkdir build
+  - cd build
+
+build_script:
+  - if [%MSVC_SETUP_ARG%]==[x64] cmake .. -G "Visual Studio 15 2017 Win64" "-DCMAKE_BUILD_TYPE=Release"
+  - if [%MSVC_SETUP_ARG%]==[x86] cmake .. -G "Visual Studio 15 2017" "-DCMAKE_BUILD_TYPE=Release"
+  - cmake --build . --config Release

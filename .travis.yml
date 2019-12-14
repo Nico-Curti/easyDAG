@@ -1,0 +1,323 @@
+language: cpp
+
+matrix:
+  fast_finish: true
+  include:
+# linux + gcc
+
+    - os: linux
+      compiler: gcc
+      name: ubuntu 14.04 - native gcc
+      env:
+        - MATRIX_EVAL=""
+
+    - os: linux
+      compiler: gcc
+      name: ubuntu 14.04 - gcc@4.8.5
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.8
+      env:
+        - MATRIX_EVAL="CC=gcc-4.8 && CXX=g++-4.8"
+
+    - os: linux
+      compiler: gcc
+      name: ubuntu 14.04 - gcc@4.9
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env:
+        - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+
+    - os: linux
+      compiler: gcc
+      name: ubuntu 14.04 - gcc@5.0
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env:
+        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+
+    - os: linux
+      compiler: gcc
+      name: ubuntu 14.04 - gcc@6.0
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env:
+        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
+
+    - os: linux
+      compiler: gcc
+      name: ubuntu 14.04 - gcc@7.0
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+
+    - os: linux
+      compiler: gcc
+      name: ubuntu 14.04 - gcc@8.0
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-8
+      env:
+        - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+
+# linux + clang
+
+    - os: linux
+      compiler: clang
+      name: ubuntu 14.04 - clang@3.6
+      dist: trusty
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-3.8
+          packages:
+            - g++-7
+            - clang-3.6
+            - libstdc++-4.8-dev
+            - libclang-3.6-dev
+            - libc++-dev
+            - libc++abi-dev
+      env:
+        - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+        - LINKER_FLAGS="-stdlib=libstdc++ -lc++abi"
+
+    - os: linux
+      compiler: clang
+      name: ubuntu 14.04 - clang@3.8
+      dist: trusty
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - clang-3.8
+            - g++-4.8-aarch64-linux-gnu
+            - gcc-4.8-aarch64-linux-gnu
+            - g++-4.8-multilib
+            - gcc-4.8-multilib
+      env:
+        - MATRIX_EVAL="CC=clang-3.8 && CXX=clang++-3.8"
+        - LINKER_FLAGS="-stdlib=libc++ -lc++abi"
+
+
+    - os: linux
+      compiler: clang
+      name: ubuntu 14.04 - clang@3.9
+      dist: trusty
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - clang-3.9
+            - g++-4.8-aarch64-linux-gnu
+            - gcc-4.8-aarch64-linux-gnu
+            - g++-4.8-multilib
+            - gcc-4.8-multilib
+      env:
+        - MATRIX_EVAL="CC=clang-3.9 && CXX=clang++-3.9"
+        - LINKER_FLAGS="-stdlib=libc++ -lc++abi"
+
+    - os: linux
+      compiler: clang
+      name: ubuntu 14.04 - clang@4.0
+      dist: trusty
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-4.0
+          packages:
+            - g++-7
+            - clang-4.0
+      env:
+        - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
+        - LINKER_FLAGS="-stdlib=libc++ -lc++abi"
+
+    - os: linux
+      compiler: clang
+      name: ubuntu 14.04 - clang@5.0
+      dist: trusty
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - clang-5.0
+            - libstdc++-7-dev
+            - libclang-5.0-dev
+
+      env:
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+        - LINKER_FLAGS="-stdlib=libc++ -lc++abi"
+
+    - os: linux
+      compiler: clang
+      name: ubuntu 14.04 - clang@6.0
+      dist: trusty
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-6.0
+            - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          packages:
+            - clang-6.0
+            - libstdc++-7-dev
+            - libclang-6.0-dev
+
+      env:
+        - MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0"
+        - LINKER_FLAGS="-stdlib=libc++ -lc++abi"
+
+    - os: linux
+      compiler: clang
+      name: ubuntu 14.04 - clang@7.0
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-6.0
+            - llvm-toolchain-trusty-7
+            - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          packages:
+            - clang-7
+            - libstdc++-7-dev
+            - libclang-7-dev
+
+      env:
+        - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
+        - LINKER_FLAGS="-stdlib=libc++ -lc++abi"
+
+# osx + gcc
+
+    - os: osx
+      osx_image: xcode10.1
+      compiler: gcc
+      name: macOS - g++-7
+      env:
+        - MATRIX_EVAL="brew update && brew reinstall gcc@7 gcc && CC=gcc-7 && CXX=g++-7"
+
+    - os: osx
+      osx_image: xcode10.1
+      compiler: gcc
+      name: macOS - g++-8
+      env:
+        - MATRIX_EVAL="brew update && brew reinstall gcc@8 gcc && CC=gcc-8 && CXX=g++-8"
+
+# osx + clang
+    - os: osx
+      osx_image: xcode10.1
+      compiler: clang
+      name: macOS - native clang (llvm backend)
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-7
+          packages:
+            - libc++-dev
+            - libc++abi-dev
+      env:
+        - MATRIX_EVAL=""
+        - LINKER_FLAGS="-stdlib=libc++ -lc++abi"
+
+    - os: osx
+      osx_image: xcode10.1
+      compiler: clang
+      name: macOS - clang@7.0
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-7
+          packages:
+            - clang-7.0
+      env:
+        - MATRIX_EVAL="brew update && brew install llvm && CC=clang-7.0 && CXX=clang++-7.0"
+        - LINKER_FLAGS="-stdlib=libc++ -lc++abi"
+
+  allow_failures:
+    - name: ubuntu 14.04 - native gcc
+    - name: ubuntu 14.04 - gcc@4.8.5
+    - name: ubuntu 14.04 - gcc@4.9
+    - name: ubuntu 14.04 - gcc@5.0
+    - name: ubuntu 14.04 - gcc@6.0
+    - name: ubuntu 14.04 - gcc@7.0
+    # - name: ubuntu 14.04 - gcc@8.0
+    - name: ubuntu 14.04 - clang@3.6
+    - name: ubuntu 14.04 - clang@3.8
+    - name: ubuntu 14.04 - clang@3.9
+    - name: ubuntu 14.04 - clang@4.0
+    - name: ubuntu 14.04 - clang@5.0
+    - name: ubuntu 14.04 - clang@6.0
+    - name: ubuntu 14.04 - clang@7.0
+    - name: macOS - g++-7
+    - name: macOS - g++-8
+    - name: macOS - native clang (llvm backend)
+    - name: macOS - clang@7.0
+
+
+before_install:
+  - travis_retry eval "${MATRIX_EVAL}"
+
+install:
+  # CMake upgrade
+
+  - if [[ "$TRAVIS_OS_NAME" == "osx"   ]]; then wget --no-check-certificate https://cmake.org/files/v3.13/cmake-3.13.1-Darwin-x86_64.tar.gz   ;fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx"   ]]; then tar -xzf cmake-3.13.1-Darwin-x86_64.tar.gz                                                    ;fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx"   ]]; then export PATH=$PWD/cmake-3.13.1-Darwin-x86_64/CMake.app/Contents/bin:$PATH                      ;fi
+
+  ###############################################################################################################################################
+
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget --no-check-certificate https://cmake.org/files/v3.13/cmake-3.13.1-Linux-x86_64.tar.gz    ;fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tar -xzf cmake-3.13.1-Linux-x86_64.tar.gz                                                     ;fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PATH=$PWD/cmake-3.13.1-Linux-x86_64/bin:$PATH                                          ;fi
+
+script:
+  - chmod 777 ./build.sh
+  - if [[ "$TRAVIS_COMPILER" == "clang" ]]; then bash ./build.sh "" OFF                                                                       ;fi
+  - if [[ "$TRAVIS_COMPILER" == "gcc"   ]]; then bash ./build.sh "" OFF                                                                       ;fi
+
+  # c++ testing
+  - cd test && chmod 777 ./run_test.sh && cd ..
+
+# after_succes:
+#   - codecov

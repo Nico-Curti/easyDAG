@@ -108,7 +108,6 @@ See [here](https://github.com/Nico-Curti/easyDAG/blob/master/CONTRIBUTING.md) fo
 
 * [easyDAG](https://github.com/eDIMESLab/easyDAG): easyDAG Python version.
 
-
 ## Authors
 
 * **Nico Curti** [git](https://github.com/Nico-Curti), [unibo](https://www.unibo.it/sitoweb/nico.curti2)

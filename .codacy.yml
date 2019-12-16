@@ -1,0 +1,9 @@
+---
+engines:
+ rubocop:
+   enabled: true
+
+exclude_paths:
+  - '.github/**'
+  - '**.md'
+  - 'docs/**'

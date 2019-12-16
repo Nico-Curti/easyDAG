@@ -30,47 +30,47 @@ public:
 
   void set (type & var);
 
-  type operator () () const;
+  constexpr type operator () () noexcept;
 
   // math operators
 
   template < typename type2 >
-  auto operator + (InputVariable < type2 > x);
+  constexpr auto operator + (InputVariable < type2 > x) noexcept;
   template < typename type2 >
-  auto operator - (InputVariable < type2 > x);
+  constexpr auto operator - (InputVariable < type2 > x) noexcept;
   template < typename type2 >
-  auto operator / (InputVariable < type2 > x);
+  constexpr auto operator / (InputVariable < type2 > x) noexcept;
   template < typename type2 >
-  auto operator * (InputVariable < type2 > x);
+  constexpr auto operator * (InputVariable < type2 > x) noexcept;
 
   template < typename lambda, typename ... types >
-  auto operator + (Step < lambda, types ... > x);
+  constexpr auto operator + (Step < lambda, types ... > x) noexcept;
   template < typename lambda, typename ... types >
-  auto operator - (Step < lambda, types ... > x);
+  constexpr auto operator - (Step < lambda, types ... > x) noexcept;
   template < typename lambda, typename ... types >
-  auto operator / (Step < lambda, types ... > x);
+  constexpr auto operator / (Step < lambda, types ... > x) noexcept;
   template < typename lambda, typename ... types >
-  auto operator * (Step < lambda, types ... > x);
+  constexpr auto operator * (Step < lambda, types ... > x) noexcept;
 
   // logical operators
 
   template < typename type2 >
-  auto operator == (InputVariable < type2 > x);
+  constexpr auto operator == (InputVariable < type2 > x) noexcept;
   template < typename type2 >
-  auto operator != (InputVariable < type2 > x);
+  constexpr auto operator != (InputVariable < type2 > x) noexcept;
   template < typename type2 >
-  auto operator >  (InputVariable < type2 > x);
+  constexpr auto operator >  (InputVariable < type2 > x) noexcept;
   template < typename type2 >
-  auto operator <  (InputVariable < type2 > x);
+  constexpr auto operator <  (InputVariable < type2 > x) noexcept;
 
   template < typename lambda, typename ... types >
-  auto operator == (Step < lambda, types ... > x);
+  constexpr auto operator == (Step < lambda, types ... > x) noexcept;
   template < typename lambda, typename ... types >
-  auto operator != (Step < lambda, types ... > x);
+  constexpr auto operator != (Step < lambda, types ... > x) noexcept;
   template < typename lambda, typename ... types >
-  auto operator >  (Step < lambda, types ... > x);
+  constexpr auto operator >  (Step < lambda, types ... > x) noexcept;
   template < typename lambda, typename ... types >
-  auto operator <  (Step < lambda, types ... > x);
+  constexpr auto operator <  (Step < lambda, types ... > x) noexcept;
 
   // IO operator
 

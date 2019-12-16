@@ -9,20 +9,6 @@
 #include <math.hpp>
 #include <input_variable.hpp>
 
-
-namespace helper
-{
-  template < int ... Is >
-  struct index {};
-
-  template < int N, int ... Is >
-  struct gen_seq : gen_seq < N - 1, N - 1, Is ... > {};
-
-  template < int ... Is >
-  struct gen_seq < 0, Is ... > : index < Is ... > {};
-}
-
-
 template < typename lambda, typename ... types >
 class Step
 {
@@ -32,11 +18,11 @@ class Step
 
   std :: tuple < types ... > args;
 
-  template < typename ... kwargs, int ... Is >
-  auto _func ( std :: tuple < kwargs ... > & tup, helper :: index < Is ... >);
+  template < typename ... kwargs, std :: size_t ... Idx >
+  constexpr auto _func ( std :: tuple < kwargs ... > & tup, std :: index_sequence < Idx ... >) noexcept;
 
   template < typename ... kwargs >
-  auto _func (std :: tuple < kwargs ... > & tup);
+  constexpr auto _func (std :: tuple < kwargs ... > & tup) noexcept;
 
   template < std :: size_t ... Idx >
   constexpr auto eval_tuple_impl (std :: index_sequence < Idx ... >) noexcept;
@@ -51,47 +37,47 @@ public:
 
   // eval method
 
-  auto operator () ();
+  constexpr auto operator () () noexcept;
 
   // math operators
 
   template < typename lambda2, typename ... types2 >
-  auto operator + (Step < lambda2, types2 ... > x);
+  constexpr auto operator + (Step < lambda2, types2 ... > x) noexcept;
   template < typename lambda2, typename ... types2 >
-  auto operator - (Step < lambda2, types2 ... > x);
+  constexpr auto operator - (Step < lambda2, types2 ... > x) noexcept;
   template < typename lambda2, typename ... types2 >
-  auto operator / (Step < lambda2, types2 ... > x);
+  constexpr auto operator / (Step < lambda2, types2 ... > x) noexcept;
   template < typename lambda2, typename ... types2 >
-  auto operator * (Step < lambda2, types2 ... > x);
+  constexpr auto operator * (Step < lambda2, types2 ... > x) noexcept;
 
   template < typename type >
-  auto operator + (InputVariable < type > x);
+  constexpr auto operator + (InputVariable < type > x) noexcept;
   template < typename type >
-  auto operator - (InputVariable < type > x);
+  constexpr auto operator - (InputVariable < type > x) noexcept;
   template < typename type >
-  auto operator / (InputVariable < type > x);
+  constexpr auto operator / (InputVariable < type > x) noexcept;
   template < typename type >
-  auto operator * (InputVariable < type > x);
+  constexpr auto operator * (InputVariable < type > x) noexcept;
 
   // logical operators
 
   template < typename lambda2, typename ... types2 >
-  auto operator == (Step < lambda2, types2 ... > x);
+  constexpr auto operator == (Step < lambda2, types2 ... > x) noexcept;
   template < typename lambda2, typename ... types2 >
-  auto operator != (Step < lambda2, types2 ... > x);
+  constexpr auto operator != (Step < lambda2, types2 ... > x) noexcept;
   template < typename lambda2, typename ... types2 >
-  auto operator >  (Step < lambda2, types2 ... > x);
+  constexpr auto operator >  (Step < lambda2, types2 ... > x) noexcept;
   template < typename lambda2, typename ... types2 >
-  auto operator <  (Step < lambda2, types2 ... > x);
+  constexpr auto operator <  (Step < lambda2, types2 ... > x) noexcept;
 
   template < typename type >
-  auto operator == (InputVariable < type > x);
+  constexpr auto operator == (InputVariable < type > x) noexcept;
   template < typename type >
-  auto operator != (InputVariable < type > x);
+  constexpr auto operator != (InputVariable < type > x) noexcept;
   template < typename type >
-  auto operator >  (InputVariable < type > x);
+  constexpr auto operator >  (InputVariable < type > x) noexcept;
   template < typename type >
-  auto operator <  (InputVariable < type > x);
+  constexpr auto operator <  (InputVariable < type > x) noexcept;
 
   // IO operator
 
@@ -111,6 +97,24 @@ namespace math
 
   template < typename ... types >
   constexpr Step < decltype(Sub_lambda), types ... > Sub (types ... args) noexcept;
+
+  template < typename ... types >
+  constexpr Step < decltype(Mul_lambda), types ... > Mul (types ... args) noexcept;
+
+  template < typename ... types >
+  constexpr Step < decltype(Div_lambda), types ... > Div (types ... args) noexcept;
+
+  template < typename ... types >
+  constexpr Step < decltype(Eq_lambda), types ... > Eq (types ... args) noexcept;
+
+  template < typename ... types >
+  constexpr Step < decltype(NEq_lambda), types ... > NEq (types ... args) noexcept;
+
+  template < typename ... types >
+  constexpr Step < decltype(Greater_lambda), types ... > Greater (types ... args) noexcept;
+
+  template < typename ... types >
+  constexpr Step < decltype(Lower_lambda), types ... > Lower (types ... args) noexcept;
 
 } // end namespace
 

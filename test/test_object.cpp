@@ -27,8 +27,8 @@ TEST_CASE ( "Test vector concat-reduce", "[vector]" )
                     return std :: accumulate(res.begin(), res.end(), 0.f);
                   };
 
-  InputVariable a(x1);
-  InputVariable b(x2);
+  auto a = InputVariable(x1);
+  auto b = InputVariable(x2);
 
   Step concatenate(concat, a, b);
   Step reduction(reduce, concatenate);

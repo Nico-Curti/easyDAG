@@ -94,7 +94,6 @@ matrix:
     - os: linux
       compiler: clang
       name: ubuntu 14.04 - clang@3.6
-      dist: trusty
       addons:
         apt:
           update: true
@@ -102,7 +101,6 @@ matrix:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-3.8
           packages:
-            - g++-7
             - clang-3.6
             - libstdc++-4.8-dev
             - libclang-3.6-dev
@@ -115,7 +113,6 @@ matrix:
     - os: linux
       compiler: clang
       name: ubuntu 14.04 - clang@3.8
-      dist: trusty
       addons:
         apt:
           update: true
@@ -135,7 +132,6 @@ matrix:
     - os: linux
       compiler: clang
       name: ubuntu 14.04 - clang@3.9
-      dist: trusty
       addons:
         apt:
           update: true
@@ -162,8 +158,9 @@ matrix:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-4.0
           packages:
-            - g++-7
             - clang-4.0
+            - libstdc++-7-dev
+            - libclang-5.0-dev
       env:
         - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
         - LINKER_FLAGS="-stdlib=libc++ -lc++abi"
@@ -286,12 +283,7 @@ matrix:
     - name: ubuntu 14.04 - clang@3.8
     - name: ubuntu 14.04 - clang@3.9
     - name: ubuntu 14.04 - clang@4.0
-    - name: ubuntu 14.04 - clang@5.0
-    - name: ubuntu 14.04 - clang@6.0
-    - name: ubuntu 14.04 - clang@7.0
     - name: macOS - g++-7
-    - name: macOS - g++-8
-    - name: macOS - native clang (llvm backend)
     - name: macOS - clang@7.0
 
 

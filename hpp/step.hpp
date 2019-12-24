@@ -6,156 +6,181 @@
 // #include cachedecorator
 
 template < typename lambda, typename ... types >
-Step < lambda, types ... > :: Step (lambda func, types ... args) : func (std :: forward < lambda >(func)), args (std :: forward < types >(args) ... )
+Step < lambda, types ... > :: Step (lambda func, types & ... args) : func (std :: forward < lambda >(func)), args (std :: tie(args ...))//, _eval (Step < lambda, types ... > :: return_t())
 {
 }
 
-template < typename lambda, typename ... types > template < typename ... kwargs, std :: size_t ... Idx >
-constexpr auto Step < lambda, types ... > :: _func ( std :: tuple < kwargs ... > & tup, std :: index_sequence < Idx ... >) noexcept
+template < typename lambda, typename ... types > template < std :: size_t Idx >
+constexpr auto Step < lambda, types ... > :: num_variables_impl () noexcept
 {
-  return this->func(std :: get < Idx >(tup) ... );
-}
+  if constexpr (Idx < sizeof ... (types))
+  {
+    using IdxType = utils :: NthTypeOf < Idx, types ... >;
+    if constexpr (details :: is_instance < IdxType, Step > :: value)
+      return IdxType :: num_variables() + num_variables_impl < Idx + 1 >();
 
-template < typename lambda, typename ... types > template < typename ... kwargs >
-constexpr auto Step < lambda, types ... > :: _func (std :: tuple < kwargs ... > & tup) noexcept
-{
-  return this->_func(tup, std :: index_sequence_for < kwargs ... > {} );
-}
-
-
-template < typename lambda, typename ... types > template < std :: size_t ... Idx >
-constexpr auto Step < lambda, types ... > :: eval_tuple_impl (std :: index_sequence < Idx ... >) noexcept
-{
-  return std :: tuple { [&]()
-                        {
-                          if constexpr (std :: is_invocable < decltype(std :: get < Idx >(this->args)) > :: value)
-                          {
-                            // if constexpr (std :: is_same_v < std :: remove_cv_t < std :: remove_reference_t < decltype(std :: get < Idx > (this->args)) > >, InputVariable < decltype(std :: get < Idx > (this->args)()) > >)
-                            // {
-                            //   return std :: get < Idx > (this->args)();
-                            // }
-                            // else
-                            // {
-                            //   return CacheDecorator(std :: get < Idx > (this->args))(std :: get < Idx > (this->args));
-                            // }
-                            return std :: get < Idx > (this->args)();
-                          }
-                          else
-                            return std :: get < Idx > (this->args);
-                         }() ...
-                      };
+    return num_operations_impl < Idx + 1 >() + 1;
+  }
+  else
+    return 0;
 }
 
 template < typename lambda, typename ... types >
-constexpr auto Step < lambda, types ... > :: eval_tuple () noexcept
+constexpr auto Step < lambda, types ... > :: num_variables () noexcept
 {
-  return eval_tuple_impl (std :: index_sequence_for < types ... > {} );
+  return num_variables_impl < 0 > ();
+}
+
+template < typename lambda, typename ... types > template < std :: size_t Idx >
+constexpr auto Step < lambda, types ... > :: num_operations_impl () noexcept
+{
+  if constexpr (Idx < sizeof ... (types))
+  {
+    using IdxType = utils :: NthTypeOf < Idx, types ... >;
+    if constexpr (utils :: is_step < IdxType >())
+      return IdxType :: num_operations() + num_operations_impl < Idx + 1 >();
+
+    return num_operations_impl < Idx + 1 >();
+  }
+  else
+    return 0;
+
+}
+
+template < typename lambda, typename ... types >
+constexpr auto Step < lambda, types ... > :: num_operations () noexcept
+{
+  return num_operations_impl < 0 > () + 1;
+}
+
+template < typename lambda, typename ... types >
+constexpr auto Step < lambda, types ... > :: size () noexcept
+{
+  return num_variables() + num_operations();
+}
+
+template < typename lambda, typename ... types > template < std :: size_t Idx >
+constexpr auto Step < lambda, types ... > :: eval_impl () noexcept
+{
+  using IdxType = utils :: NthTypeOf < Idx, types ... >;
+  if constexpr (details :: is_instance < IdxType, Step > :: value)
+  {
+    if constexpr (Idx + 1 < sizeof ... (types))
+      return this->func(std :: get < Idx >(this->args).eval(), eval_impl < Idx + 1 >());
+    else
+      return std :: get < Idx >(this->args).eval();
+  }
+  else
+    return std :: get < Idx >(this->args);
+}
+
+template < typename lambda, typename ... types >
+constexpr auto Step < lambda, types ... > :: eval () noexcept
+{
+  return eval_impl < 0 >();
 }
 
 template < typename lambda, typename ... types >
 constexpr auto Step < lambda, types ... > :: operator () () noexcept
 {
-  auto kwargs = this->eval_tuple();
-  return this->_func(kwargs);
+  return this->func(eval_impl < 0 >());
 }
 
-template < typename lambda, typename ... types > template < typename lambda2, typename ... types2 >
-constexpr auto Step < lambda, types ... > :: operator + (Step < lambda2, types2 ... > x) noexcept
+template < typename lambda, typename ... types >
+constexpr auto Step < lambda, types ... > :: arguments () noexcept
 {
-  return Step < decltype(math :: Add_lambda), Step < lambda, types ... >, Step < lambda2, types2 ... > > (math :: Add_lambda, *this, x);
+  return this->args;
 }
 
-template < typename lambda, typename ... types > template < typename lambda2, typename ... types2 >
-constexpr auto Step < lambda, types ... > :: operator - (Step < lambda2, types2 ... > x) noexcept
+template < typename lambda, typename ... types >
+constexpr void Step < lambda, types ... > :: set (types & ... args) noexcept
 {
-  return Step < decltype(math :: Sub_lambda), Step < lambda, types ... >, Step < lambda2, types2 ... > > (math :: Sub_lambda, *this, x);
+  this->args = std :: tuple < types ... >(args ... );
+  //if ( this->_eval != return_t() )
+  //  this->_eval = this->eval ();
 }
 
-template < typename lambda, typename ... types > template < typename lambda2, typename ... types2 >
-constexpr auto Step < lambda, types ... > :: operator * (Step < lambda2, types2 ... > x) noexcept
+template < typename lambda, typename ... types > template < class T >
+constexpr auto Step < lambda, types ... > :: operator + (T x) noexcept
 {
-  return Step < decltype(math :: Mul_lambda), Step < lambda, types ... >, Step < lambda2, types2 ... > > (math :: Mul_lambda, *this, x);
+  return Step < decltype(math :: Add_lambda), Step < lambda, types ... >, T > (math :: Add_lambda, *this, x);
 }
 
-template < typename lambda, typename ... types > template < typename lambda2, typename ... types2 >
-constexpr auto Step < lambda, types ... > :: operator / (Step < lambda2, types2 ... > x) noexcept
+template < typename lambda, typename ... types > template < class T >
+constexpr auto Step < lambda, types ... > :: operator - (T x) noexcept
 {
-  return Step < decltype(math :: Div_lambda), Step < lambda, types ... >, Step < lambda2, types2 ... > > (math :: Div_lambda, *this, x);
+  return Step < decltype(math :: Sub_lambda), Step < lambda, types ... >, T > (math :: Sub_lambda, *this, x);
 }
 
-template < typename lambda, typename ... types > template < typename lambda2, typename ... types2 >
-constexpr auto Step < lambda, types ... > :: operator == (Step < lambda2, types2 ... > x) noexcept
+template < typename lambda, typename ... types > template < class T >
+constexpr auto Step < lambda, types ... > :: operator * (T x) noexcept
 {
-  return Step < decltype(math :: Eq_lambda), Step < lambda, types ... >, Step < lambda2, types2 ... > > (math :: Eq_lambda, *this, x);
+  return Step < decltype(math :: Mul_lambda), Step < lambda, types ... >, T > (math :: Mul_lambda, *this, x);
 }
 
-template < typename lambda, typename ... types > template < typename lambda2, typename ... types2 >
-constexpr auto Step < lambda, types ... > :: operator != (Step < lambda2, types2 ... > x) noexcept
+template < typename lambda, typename ... types > template < class T >
+constexpr auto Step < lambda, types ... > :: operator / (T x) noexcept
 {
-  return Step < decltype(math :: NEq_lambda), Step < lambda, types ... >, Step < lambda2, types2 ... > > (math :: NEq_lambda, *this, x);
+  return Step < decltype(math :: Div_lambda), Step < lambda, types ... >, T > (math :: Div_lambda, *this, x);
 }
 
-template < typename lambda, typename ... types > template < typename lambda2, typename ... types2 >
-constexpr auto Step < lambda, types ... > :: operator < (Step < lambda2, types2 ... > x) noexcept
+template < typename lambda, typename ... types > template < class T >
+constexpr auto Step < lambda, types ... > :: operator == (T x) noexcept
 {
-  return Step < decltype(math :: Lower_lambda), Step < lambda, types ... >, Step < lambda2, types2 ... > > (math :: Lower_lambda, *this, x);
+  return Step < decltype(math :: Eq_lambda), Step < lambda, types ... >, T > (math :: Eq_lambda, *this, x);
 }
 
-template < typename lambda, typename ... types > template < typename lambda2, typename ... types2 >
-constexpr auto Step < lambda, types ... > :: operator > (Step < lambda2, types2 ... > x) noexcept
+template < typename lambda, typename ... types > template < class T >
+constexpr auto Step < lambda, types ... > :: operator != (T x) noexcept
 {
-  return Step < decltype(math :: Greater_lambda), Step < lambda, types ... >, Step < lambda2, types2 ... > > (math :: Greater_lambda, *this, x);
+  return Step < decltype(math :: NEq_lambda), Step < lambda, types ... >, T > (math :: NEq_lambda, *this, x);
 }
 
-// cas with inputvariable
-
-
-template < typename lambda, typename ... types > template < typename type >
-constexpr auto Step < lambda, types ... > :: operator + (InputVariable < type > x) noexcept
+template < typename lambda, typename ... types > template < class T >
+constexpr auto Step < lambda, types ... > :: operator < (T x) noexcept
 {
-  return Step < decltype(math :: Add_lambda), Step < lambda, types ... >, InputVariable < type > > (math :: Add_lambda, *this, x);
+  return Step < decltype(math :: Lower_lambda), Step < lambda, types ... >, T > (math :: Lower_lambda, *this, x);
 }
 
-template < typename lambda, typename ... types > template < typename type >
-constexpr auto Step < lambda, types ... > :: operator - (InputVariable < type > x) noexcept
+template < typename lambda, typename ... types > template < class T >
+constexpr auto Step < lambda, types ... > :: operator > (T x) noexcept
 {
-  return Step < decltype(math :: Sub_lambda), Step < lambda, types ... >, InputVariable < type > > (math :: Sub_lambda, *this, x);
+  return Step < decltype(math :: Greater_lambda), Step < lambda, types ... >, T > (math :: Greater_lambda, *this, x);
 }
 
-template < typename lambda, typename ... types > template < typename type >
-constexpr auto Step < lambda, types ... > :: operator * (InputVariable < type > x) noexcept
+template < std :: size_t I = 0, char symbol, typename ... Tp >
+void print ( std :: tuple < Tp ... > & t)
 {
-  return Step < decltype(math :: Mul_lambda), Step < lambda, types ... >, InputVariable < type > > (math :: Mul_lambda, *this, x);
+  if constexpr (I > 0)
+  {
+    std :: cout << std :: get < I >(t) << " " << symbol << " ";
+    print < I - 1, symbol, Tp ... >(t);
+  }
+  else
+    std :: cout << std :: get < I >(t) << " ";
 }
 
-template < typename lambda, typename ... types > template < typename type >
-constexpr auto Step < lambda, types ... > :: operator / (InputVariable < type > x) noexcept
+template < typename lambda, typename ... types >
+std :: ostream & operator << (std :: ostream & os, const Step < lambda, types ... > & x)
 {
-  return Step < decltype(math :: Div_lambda), Step < lambda, types ... >, InputVariable < type > > (math :: Div_lambda, *this, x);
+  auto kwargs = x.arguments();
+  os << "Step ( ";
+  print < std :: tuple_size < decltype(kwargs) > :: value - 1, lambda :: symbol() > (kwargs);
+  os << ")";
+  return os;
 }
 
-template < typename lambda, typename ... types > template < typename type >
-constexpr auto Step < lambda, types ... > :: operator == (InputVariable < type > x) noexcept
+template < typename type >
+constexpr Step < decltype(math :: Input), type > InputVariable (type & var) noexcept
 {
-  return Step < decltype(math :: Eq_lambda), Step < lambda, types ... >, InputVariable < type > > (math :: Eq_lambda, *this, x);
+  return Step < decltype(math :: Input), type >(math :: Input, var);
 }
 
-template < typename lambda, typename ... types > template < typename type >
-constexpr auto Step < lambda, types ... > :: operator != (InputVariable < type > x) noexcept
+template < typename type >
+constexpr Step < decltype(math :: Input), type > InputVariable () noexcept
 {
-  return Step < decltype(math :: NEq_lambda), Step < lambda, types ... >, InputVariable < type > > (math :: NEq_lambda, *this, x);
-}
-
-template < typename lambda, typename ... types > template < typename type >
-constexpr auto Step < lambda, types ... > :: operator < (InputVariable < type > x) noexcept
-{
-  return Step < decltype(math :: Lower_lambda), Step < lambda, types ... >, InputVariable < type > > (math :: Lower_lambda, *this, x);
-}
-
-template < typename lambda, typename ... types > template < typename type >
-constexpr auto Step < lambda, types ... > :: operator > (InputVariable < type > x) noexcept
-{
-  return Step < decltype(math :: Greater_lambda), Step < lambda, types ... >, InputVariable < type > > (math :: Greater_lambda, *this, x);
+  type dummy = type();
+  return Step < decltype(math :: Input), type >(math :: Input, dummy);
 }
 
 // aliases
@@ -214,6 +239,28 @@ namespace math
 } // end namespace
 
 
+namespace utils
+{
+
+template < class U >
+constexpr bool is_step () noexcept
+{
+  if constexpr (details :: is_instance < U, Step > :: value)
+    return !std :: is_same_v < typename U :: lambda_func, decltype(math :: Input) >;
+
+  return false;
+}
+
+template < class U >
+constexpr bool is_variable () noexcept
+{
+  if constexpr (is_step < U >())
+    return std :: is_same_v < typename U :: lambda_func, decltype(math :: Input) >;
+
+  return true;
+}
+
+} // end namespace
 
 
 #endif // __step_hpp__

@@ -12,122 +12,119 @@ struct
     return first;
   }
 
-  template < typename type, typename ... types >
-  auto operator () (type first, types ... args)
+  static constexpr char symbol ()
   {
-    return first + operator()(args...);
+    return ' ';
+  }
+
+} Input;
+
+struct
+{
+  template < typename ... types >
+  auto operator () (types ... args)
+  {
+    return (args + ...);
+  }
+
+  static constexpr char symbol ()
+  {
+    return '+';
   }
 
 } Add_lambda;
 
 struct
 {
-  template < typename type >
-  auto operator () (type first)
+  template < typename ... types >
+  auto operator () (types ... args)
   {
-    return first;
+    return (args - ...);
   }
 
-  template < typename type, typename ... types >
-  auto operator () (type first, types ... args)
+  static constexpr char symbol ()
   {
-    return first - operator()(args...);
+    return '-';
   }
 
 } Sub_lambda;
 
 struct
 {
-  template < typename type >
-  auto operator () (type first)
+  template < typename ... types >
+  auto operator () (types ... args)
   {
-    return first;
+    return (args * ...);
   }
 
-  template < typename type, typename ... types >
-  auto operator () (type first, types ... args)
+  static constexpr char symbol ()
   {
-    return first * operator()(args...);
+    return '*';
   }
 
 } Mul_lambda;
 
 struct
 {
-  template < typename type >
-  auto operator () (type first)
+  template < typename ... types >
+  auto operator () (types ... args)
   {
-    return first;
+    return (args / ...);
   }
 
-  template < typename type, typename ... types >
-  auto operator () (type first, types ... args)
+  static constexpr char symbol ()
   {
-    return first / operator()(args...);
+    return '/';
   }
 
 } Div_lambda;
 
 struct
 {
-  template < typename type >
-  auto operator () (type first)
+  template < typename ... types >
+  auto operator () (types ... args)
   {
-    return first;
-  }
-
-  template < typename type, typename ... types >
-  auto operator () (type first, types ... args)
-  {
-    return first == operator()(args...);
+    return (args == ...);
   }
 
 } Eq_lambda;
 
 struct
 {
-  template < typename type >
-  auto operator () (type first)
+  template < typename ... types >
+  auto operator () (types ... args)
   {
-    return first;
-  }
-
-  template < typename type, typename ... types >
-  auto operator () (type first, types ... args)
-  {
-    return first != operator()(args...);
+    return (args != ...);
   }
 
 } NEq_lambda;
 
 struct
 {
-  template < typename type >
-  auto operator () (type first)
+  template < typename ... types >
+  auto operator () (types ... args)
   {
-    return first;
+    return (args > ...);
   }
 
-  template < typename type, typename ... types >
-  auto operator () (type first, types ... args)
+  static constexpr char symbol ()
   {
-    return first > operator()(args...);
+    return '>';
   }
 
 } Greater_lambda;
 
 struct
 {
-  template < typename type >
-  auto operator () (type first)
+  template < typename ... types >
+  auto operator () (types ... args)
   {
-    return first;
+    return (args < ...);
   }
 
-  template < typename type, typename ... types >
-  auto operator () (type first, types ... args)
+  static constexpr char symbol ()
   {
-    return first < operator()(args...);
+    return '<';
   }
 
 } Lower_lambda;

@@ -7,84 +7,103 @@
 #include <tuple>
 
 #include <math.hpp>
-#include <input_variable.hpp>
+
+namespace details
+{
+
+template < class, template < class ... > class, class ... >
+struct is_instance : public std :: false_type {};
+
+template < class T, template < class ... > class U, class ... V >
+struct is_instance < U < T, V ... >, U > : public std :: true_type {};
+
+}
+
 
 template < typename lambda, typename ... types >
 class Step
 {
   // Private members
-
   lambda func;
 
   std :: tuple < types ... > args;
 
-  template < typename ... kwargs, std :: size_t ... Idx >
-  constexpr auto _func ( std :: tuple < kwargs ... > & tup, std :: index_sequence < Idx ... >) noexcept;
-
-  template < typename ... kwargs >
-  constexpr auto _func (std :: tuple < kwargs ... > & tup) noexcept;
-
-  template < std :: size_t ... Idx >
-  constexpr auto eval_tuple_impl (std :: index_sequence < Idx ... >) noexcept;
-
-  constexpr auto eval_tuple () noexcept;
+  template < std :: size_t Idx >
+  constexpr auto eval_impl () noexcept;
 
 public:
 
+  using lambda_func = lambda;
+
   // Constructor
 
-  Step (lambda func, types ... args);
+  Step (lambda func, types & ... args);
+
+  // setter function
+
+  constexpr void set (types & ... args) noexcept;
 
   // eval method
 
   constexpr auto operator () () noexcept;
 
+  // getter function
+
+  template < std :: size_t Idx >
+  static constexpr auto num_variables_impl () noexcept;
+
+  template < std :: size_t Idx >
+  static constexpr auto num_operations_impl () noexcept;
+
+  constexpr auto arguments () noexcept;
+  static constexpr auto num_variables () noexcept;
+  static constexpr auto num_operations () noexcept;
+  static constexpr auto size () noexcept;
+  constexpr auto eval () noexcept;
+
   // math operators
 
-  template < typename lambda2, typename ... types2 >
-  constexpr auto operator + (Step < lambda2, types2 ... > x) noexcept;
-  template < typename lambda2, typename ... types2 >
-  constexpr auto operator - (Step < lambda2, types2 ... > x) noexcept;
-  template < typename lambda2, typename ... types2 >
-  constexpr auto operator / (Step < lambda2, types2 ... > x) noexcept;
-  template < typename lambda2, typename ... types2 >
-  constexpr auto operator * (Step < lambda2, types2 ... > x) noexcept;
-
-  template < typename type >
-  constexpr auto operator + (InputVariable < type > x) noexcept;
-  template < typename type >
-  constexpr auto operator - (InputVariable < type > x) noexcept;
-  template < typename type >
-  constexpr auto operator / (InputVariable < type > x) noexcept;
-  template < typename type >
-  constexpr auto operator * (InputVariable < type > x) noexcept;
+  template < typename type2 >
+  constexpr auto operator + (type2 x) noexcept;
+  template < typename type2 >
+  constexpr auto operator - (type2 x) noexcept;
+  template < typename type2 >
+  constexpr auto operator / (type2 x) noexcept;
+  template < typename type2 >
+  constexpr auto operator * (type2 x) noexcept;
 
   // logical operators
 
-  template < typename lambda2, typename ... types2 >
-  constexpr auto operator == (Step < lambda2, types2 ... > x) noexcept;
-  template < typename lambda2, typename ... types2 >
-  constexpr auto operator != (Step < lambda2, types2 ... > x) noexcept;
-  template < typename lambda2, typename ... types2 >
-  constexpr auto operator >  (Step < lambda2, types2 ... > x) noexcept;
-  template < typename lambda2, typename ... types2 >
-  constexpr auto operator <  (Step < lambda2, types2 ... > x) noexcept;
-
-  template < typename type >
-  constexpr auto operator == (InputVariable < type > x) noexcept;
-  template < typename type >
-  constexpr auto operator != (InputVariable < type > x) noexcept;
-  template < typename type >
-  constexpr auto operator >  (InputVariable < type > x) noexcept;
-  template < typename type >
-  constexpr auto operator <  (InputVariable < type > x) noexcept;
+  template < typename type2 >
+  constexpr auto operator == (type2 x) noexcept;
+  template < typename type2 >
+  constexpr auto operator != (type2 x) noexcept;
+  template < typename type2 >
+  constexpr auto operator >  (type2 x) noexcept;
+  template < typename type2 >
+  constexpr auto operator <  (type2 x) noexcept;
 
   // IO operator
 
   template < typename _lambda, typename ... _types >
   friend std :: ostream & operator << (std :: ostream & os, const Step < _lambda, _types ... > & x);
 
+private:
+
+//  using return_t = typename std :: result_of < decltype(&Step < lambda, types ... > :: eval)(Step < lambda, types ... >) > :: type;
+//
+//  return_t _eval;
+
 };
+
+template < std :: size_t I = 0, char symbol, typename ... Tp >
+void print ( std :: tuple < Tp ... > & t);
+
+template < typename type >
+constexpr Step < decltype(math :: Input), type > InputVariable (type & var) noexcept;
+
+template < typename type >
+constexpr Step < decltype(math :: Input), type > InputVariable () noexcept;
 
 
 // aliases
@@ -118,5 +137,29 @@ namespace math
 
 } // end namespace
 
+
+namespace utils
+{
+  template < int N, typename ... Ts > using NthTypeOf = typename std :: tuple_element < N, std :: tuple < Ts ... > > :: type;
+
+  template < class U >
+  constexpr bool is_step () noexcept;
+
+  template < class U >
+  constexpr bool is_variable () noexcept;
+
+  template < typename lambda, typename ... types >
+  struct OperationCount {};
+
+  template < typename lambda, typename ... types >
+  struct OperationCount < Step < lambda, types ... > >
+  {
+    static constexpr int num_nodes = Step < lambda, types ... > :: size();
+    static constexpr int num_operations = Step < lambda, types ... > :: num_operations();
+    static constexpr int num_variables = Step < lambda, types ... > :: num_variables();
+    // static constexpr int num_cached = 0;
+  };
+
+}
 
 #endif // __step_h__

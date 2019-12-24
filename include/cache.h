@@ -10,7 +10,7 @@ class CacheDecorator
 
   // Private members
 
-  using return_t = typename std :: result_of < Step < lambda, types ...>() >;
+  using return_t = typename std :: result_of < Step < lambda, types ... > () > :: type;
 
   std :: map < Step < lambda, types ... >, return_t > map;
 

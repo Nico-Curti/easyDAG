@@ -8,7 +8,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/Nico-Curti/easyDAG.svg?label=Stars&style=social)](https://github.com/Nico-Curti/easyDAG/stargazers)
 [![GitHub watchers](https://img.shields.io/github/watchers/Nico-Curti/easyDAG.svg?label=Watch&style=social)](https://github.com/Nico-Curti/easyDAG/watchers)
 
-![gcc version](https://img.shields.io/badge/gcc-%208.*%20|%209.*-yellow.svg)
+![gcc version](https://img.shields.io/badge/gcc-%207.*%20|%208.*%20|%209.*-yellow.svg)
 
 ![clang version](https://img.shields.io/badge/clang-5.*%20|%206.*%20|%207.*%20|-red.svg)
 

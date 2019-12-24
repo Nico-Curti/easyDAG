@@ -101,10 +101,16 @@ struct
 
 struct
 {
-  template < typename ... types >
-  auto operator () (types ... args)
+  template < typename type >
+  auto operator () (type args)
   {
-    return (args > ...);
+    return args;
+  }
+
+  template < typename type, typename ... types >
+  auto operator () (type first, types ... args)
+  {
+    return first > operator()(args ...);
   }
 
   static constexpr char symbol ()
@@ -116,10 +122,16 @@ struct
 
 struct
 {
-  template < typename ... types >
-  auto operator () (types ... args)
+  template < typename type >
+  auto operator () (type args)
   {
-    return (args < ...);
+    return args;
+  }
+
+  template < typename type, typename ... types >
+  auto operator () (type first, types ... args)
+  {
+    return first < operator()(args ...);
   }
 
   static constexpr char symbol ()

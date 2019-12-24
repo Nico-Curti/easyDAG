@@ -277,13 +277,11 @@ matrix:
     - name: ubuntu 14.04 - gcc@4.9
     - name: ubuntu 14.04 - gcc@5.0
     - name: ubuntu 14.04 - gcc@6.0
-    - name: ubuntu 14.04 - gcc@7.0
     # - name: ubuntu 14.04 - gcc@8.0
     - name: ubuntu 14.04 - clang@3.6
     - name: ubuntu 14.04 - clang@3.8
     - name: ubuntu 14.04 - clang@3.9
     - name: ubuntu 14.04 - clang@4.0
-    - name: macOS - g++-7
     - name: macOS - clang@7.0
 
 

@@ -148,7 +148,7 @@ constexpr auto Step < lambda, types ... > :: operator > (T x) noexcept
   return Step < decltype(math :: Greater_lambda), Step < lambda, types ... >, T > (math :: Greater_lambda, *this, x);
 }
 
-template < std :: size_t I = 0, char symbol, typename ... Tp >
+template < std :: size_t I, char symbol, typename ... Tp >
 void print ( std :: tuple < Tp ... > & t)
 {
   if constexpr (I > 0)

@@ -17,7 +17,7 @@ add_definitions (-DMAJOR=${DAG_MAJOR} -DMINOR=${DAG_MINOR} -DREVISION=${DAG_REVI
 #                         COMPILE OPTIONS                       #
 #################################################################
 
-# option (OMP        "Enable OpenMP                support" OFF)
+option (OMP        "Enable OpenMP                support" OFF)
 option (BUILD_TEST "Enable tests build           support" ON)
 
 #################################################################
@@ -89,22 +89,22 @@ endif()
 #                         PARSE OPTIONS                         #
 #################################################################
 
-# if (OMP)
-#   find_package(OpenMP REQUIRED)
-#   if (OPENMP_FOUND)
-#     message(STATUS "OpenMP found")
-#     if (OpenMP_CXX_VERSION_MAJOR LESS_EQUAL 4 AND OpenMP_CXX_VERSION_MINOR LESS 5)
-#       message(FATAL_ERROR " Your OpenMP is too old. Required OpenMP 4.5. Please upgrade.")
-#     endif()
-#     message(STATUS "OpenMP found")
-#     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-#     if (APPLE)
-#       list(APPEND linked_libs OpenMP::OpenMP_CXX)
-#     endif()
-#   endif()
-# else()
-#   message(STATUS "OpenMP disabled")
-# endif()
+if (OMP)
+  find_package(OpenMP REQUIRED)
+  if (OPENMP_FOUND)
+    message(STATUS "OpenMP found")
+    if (OpenMP_CXX_VERSION_MAJOR LESS_EQUAL 4 AND OpenMP_CXX_VERSION_MINOR LESS 5)
+      message(FATAL_ERROR " Your OpenMP is too old. Required OpenMP 4.5. Please upgrade.")
+    endif()
+    message(STATUS "OpenMP found")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    if (APPLE)
+      list(APPEND linked_libs OpenMP::OpenMP_CXX)
+    endif()
+  endif()
+else()
+  message(STATUS "OpenMP disabled")
+endif()
 
 #################################################################
 #                         SETTING DIRECTORIES                   #

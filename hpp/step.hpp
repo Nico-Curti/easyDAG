@@ -77,13 +77,47 @@ constexpr auto Step < lambda, types ... > :: eval_impl () noexcept
 template < typename lambda, typename ... types >
 constexpr auto Step < lambda, types ... > :: eval () noexcept
 {
-  return eval_impl < 0 >();
+  using res_t = typename std :: result_of < decltype(& Step < lambda, types ... > :: eval_impl < 0 >)(Step < lambda, types ... >) > :: type;
+
+  res_t res;
+
+  #ifdef _OPENMP
+    #pragma omp task shared (res)
+    {
+  #endif
+
+      res = eval_impl < 0 >();
+
+  #ifdef _OPENMP
+    }
+    #pragma omp taskwait
+  #endif
+
+  return res;
 }
 
 template < typename lambda, typename ... types >
 constexpr auto Step < lambda, types ... > :: operator () () noexcept
 {
-  return this->func(eval_impl < 0 >());
+  using return_t = typename std :: result_of < decltype(& Step < lambda, types ... > :: eval)(Step < lambda, types ... >)> :: type;
+  using res_t = typename std :: result_of < lambda(return_t)> :: type;
+
+  res_t res;
+
+  #ifdef _OPENMP
+    #pragma omp parallel
+    {
+      #pragma omp single
+      {
+  #endif
+
+        res = this->func(eval());
+  #ifdef _OPENMP
+      }
+    }
+  #endif
+
+  return res;
 }
 
 template < typename lambda, typename ... types >

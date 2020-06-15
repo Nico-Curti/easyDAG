@@ -18,4 +18,10 @@ if [[ $? != 0 ]]; then
   exit 1;
 fi
 
+./bin/test_utils
+if [[ $? != 0 ]]; then
+  echo "${red}ERROR${reset}"
+  exit 1;
+fi
+
 echo "${green}PASSED${reset}"

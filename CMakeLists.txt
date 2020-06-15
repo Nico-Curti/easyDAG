@@ -17,7 +17,6 @@ add_definitions (-DMAJOR=${DAG_MAJOR} -DMINOR=${DAG_MINOR} -DREVISION=${DAG_REVI
 #                         COMPILE OPTIONS                       #
 #################################################################
 
-option (OMP        "Enable OpenMP                support" OFF)
 option (BUILD_TEST "Enable tests build           support" ON)
 
 #################################################################
@@ -89,22 +88,11 @@ endif()
 #                         PARSE OPTIONS                         #
 #################################################################
 
-if (OMP)
-  find_package(OpenMP REQUIRED)
-  if (OPENMP_FOUND)
-    message(STATUS "OpenMP found")
-    if (OpenMP_CXX_VERSION_MAJOR LESS_EQUAL 4 AND OpenMP_CXX_VERSION_MINOR LESS 5)
-      message(FATAL_ERROR " Your OpenMP is too old. Required OpenMP 4.5. Please upgrade.")
-    endif()
-    message(STATUS "OpenMP found")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    if (APPLE)
-      list(APPEND linked_libs OpenMP::OpenMP_CXX)
-    endif()
-  endif()
-else()
-  message(STATUS "OpenMP disabled")
-endif()
+message (STATUS "Looking for pthread library")
+set (CMAKE_THREAD_PREFER_PTHREAD ON)
+find_package (Threads REQUIRED)
+list (APPEND linked_libs Threads::Threads )
+#    add_definitions (-D_DEFAULT_SOURCE) # remove me in the future
 
 #################################################################
 #                         SETTING DIRECTORIES                   #
@@ -180,6 +168,10 @@ message(STATUS ""                                                               
 if (BUILD_TEST)
   add_subdirectory(${TEST_DIR})
 endif()
+
+# add_executable(runtest ${EXAMPLE}/runtest.cpp ${HEADER} ${HPP})
+# target_link_libraries(runtest ${linked_libs})# ${DAGlib})
+
 
 #################################################################
 #                          INSTALLERS                           #

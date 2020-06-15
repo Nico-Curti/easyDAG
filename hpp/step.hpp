@@ -2,24 +2,27 @@
 #define __step_hpp__
 
 #include <step.h>
-#include <math.hpp>
-// #include cachedecorator
+
+#include <alias.hpp>
+#include <helper.hpp>
+#include <utils.hpp>
+
 
 template < typename lambda, typename ... types >
-Step < lambda, types ... > :: Step (lambda func, types & ... args) : func (std :: forward < lambda >(func)), args (std :: tie(args ...))//, _eval (Step < lambda, types ... > :: return_t())
+Step < lambda, types ... > :: Step (lambda & func, types & ... args) : func (std :: forward < lambda >(func)), args (std :: tie(args ...)), value ( std :: async ( std :: launch :: async, & Step < lambda, types ... > :: evaluate, this ) )
 {
 }
 
-template < typename lambda, typename ... types > template < std :: size_t Idx >
+template < typename lambda, typename ... types > template < std :: size_t idx >
 constexpr auto Step < lambda, types ... > :: num_variables_impl () noexcept
 {
-  if constexpr (Idx < sizeof ... (types))
+  if constexpr (idx < sizeof ... (types))
   {
-    using IdxType = utils :: NthTypeOf < Idx, types ... >;
-    if constexpr (details :: is_instance < IdxType, Step > :: value)
-      return IdxType :: num_variables() + num_variables_impl < Idx + 1 >();
+    using idx_t = utils :: nth_type_of < idx, types ... >;
+    if constexpr (details :: is_instance < idx_t, Step > :: value)
+      return idx_t :: num_variables() + num_variables_impl < idx + 1 >();
 
-    return num_operations_impl < Idx + 1 >() + 1;
+    return num_operations_impl < idx + 1 >() + 1;
   }
   else
     return 0;
@@ -31,16 +34,16 @@ constexpr auto Step < lambda, types ... > :: num_variables () noexcept
   return num_variables_impl < 0 > ();
 }
 
-template < typename lambda, typename ... types > template < std :: size_t Idx >
+template < typename lambda, typename ... types > template < std :: size_t idx >
 constexpr auto Step < lambda, types ... > :: num_operations_impl () noexcept
 {
-  if constexpr (Idx < sizeof ... (types))
+  if constexpr (idx < sizeof ... (types))
   {
-    using IdxType = utils :: NthTypeOf < Idx, types ... >;
-    if constexpr (utils :: is_step < IdxType >())
-      return IdxType :: num_operations() + num_operations_impl < Idx + 1 >();
+    using idx_t = utils :: nth_type_of < idx, types ... >;
+    if constexpr (utils :: is_step < idx_t >())
+      return idx_t :: num_operations() + num_operations_impl < idx + 1 >();
 
-    return num_operations_impl < Idx + 1 >();
+    return num_operations_impl < idx + 1 >();
   }
   else
     return 0;
@@ -59,65 +62,37 @@ constexpr auto Step < lambda, types ... > :: size () noexcept
   return num_variables() + num_operations();
 }
 
-template < typename lambda, typename ... types > template < std :: size_t Idx >
-constexpr auto Step < lambda, types ... > :: eval_impl () noexcept
+template < typename lambda, typename ... types > template < class type >
+constexpr auto Step < lambda, types ... > :: eval_impl (type & arg) noexcept
 {
-  using IdxType = utils :: NthTypeOf < Idx, types ... >;
-  if constexpr (details :: is_instance < IdxType, Step > :: value)
-  {
-    if constexpr (Idx + 1 < sizeof ... (types))
-      return this->func(std :: get < Idx >(this->args).eval(), eval_impl < Idx + 1 >());
-    else
-      return std :: get < Idx >(this->args).eval();
-  }
+  if constexpr ( details :: is_instance < std :: remove_reference_t < type > , Step > :: value )
+    return arg();
   else
-    return std :: get < Idx >(this->args);
+    return arg;
 }
 
 template < typename lambda, typename ... types >
-constexpr auto Step < lambda, types ... > :: eval () noexcept
+constexpr auto Step < lambda, types ... > :: packing (types  & ... arg) noexcept
 {
-  using res_t = typename std :: result_of < decltype(& Step < lambda, types ... > :: eval_impl < 0 >)(Step < lambda, types ... >) > :: type;
-
-  res_t res;
-
-  #ifdef _OPENMP
-    #pragma omp task shared (res)
-    {
-  #endif
-
-      res = eval_impl < 0 >();
-
-  #ifdef _OPENMP
-    }
-    #pragma omp taskwait
-  #endif
-
-  return res;
+  return std :: make_tuple (eval_impl(arg) ...);
 }
 
 template < typename lambda, typename ... types >
-constexpr auto Step < lambda, types ... > :: operator () () noexcept
+constexpr decltype(auto) Step < lambda, types ... > :: eval () noexcept
 {
-  using return_t = typename std :: result_of < decltype(& Step < lambda, types ... > :: eval)(Step < lambda, types ... >)> :: type;
-  using res_t = typename std :: result_of < lambda(return_t)> :: type;
+  return std :: apply(packing, this->args);
+}
 
-  res_t res;
+template < typename lambda, typename ... types >
+constexpr decltype(auto) Step < lambda, types ... > :: evaluate () noexcept
+{
+  return std :: apply(this->func, this->eval());
+}
 
-  #ifdef _OPENMP
-    #pragma omp parallel
-    {
-      #pragma omp single
-      {
-  #endif
-
-        res = this->func(eval());
-  #ifdef _OPENMP
-      }
-    }
-  #endif
-
-  return res;
+template < typename lambda, typename ... types >
+constexpr decltype(auto) Step < lambda, types ... > :: operator () () noexcept
+{
+  return this->value.get();
 }
 
 template < typename lambda, typename ... types >
@@ -130,8 +105,7 @@ template < typename lambda, typename ... types >
 constexpr void Step < lambda, types ... > :: set (types & ... args) noexcept
 {
   this->args = std :: tuple < types ... >(args ... );
-  //if ( this->_eval != return_t() )
-  //  this->_eval = this->eval ();
+  this->value = std :: async ( std :: launch :: async, & Step < lambda, types ... > :: evaluate, this );
 }
 
 template < typename lambda, typename ... types > template < class T >
@@ -182,20 +156,9 @@ constexpr auto Step < lambda, types ... > :: operator > (T x) noexcept
   return Step < decltype(math :: Greater_lambda), Step < lambda, types ... >, T > (math :: Greater_lambda, *this, x);
 }
 
-template < std :: size_t I, char symbol, typename ... Tp >
-void print ( std :: tuple < Tp ... > & t)
-{
-  if constexpr (I > 0)
-  {
-    std :: cout << std :: get < I >(t) << " " << symbol << " ";
-    print < I - 1, symbol, Tp ... >(t);
-  }
-  else
-    std :: cout << std :: get < I >(t) << " ";
-}
 
 template < typename lambda, typename ... types >
-std :: ostream & operator << (std :: ostream & os, const Step < lambda, types ... > & x)
+std :: ostream & operator << (std :: ostream & os, Step < lambda, types ... > x)
 {
   auto kwargs = x.arguments();
   os << "Step ( ";
@@ -216,85 +179,5 @@ constexpr Step < decltype(math :: Input), type > InputVariable () noexcept
   type dummy = type();
   return Step < decltype(math :: Input), type >(math :: Input, dummy);
 }
-
-// aliases
-
-namespace math
-{
-
-  template < typename ... types >
-  constexpr Step < decltype(Add_lambda), types ... > Sum (types ... args) noexcept
-  {
-    return Step < decltype(Add_lambda), types ... >(Add_lambda, args ...);
-  }
-
-  template < typename ... types >
-  constexpr Step < decltype(Sub_lambda), types ... > Sub (types ... args) noexcept
-  {
-    return Step < decltype(Sub_lambda), types ... >(Sub_lambda, args ...);
-  }
-
-  template < typename ... types >
-  constexpr Step < decltype(Mul_lambda), types ... > Mul (types ... args) noexcept
-  {
-    return Step < decltype(Mul_lambda), types ... >(Mul_lambda, args ...);
-  }
-
-  template < typename ... types >
-  constexpr Step < decltype(Div_lambda), types ... > Div (types ... args) noexcept
-  {
-    return Step < decltype(Div_lambda), types ... >(Div_lambda, args ...);
-  }
-
-  template < typename ... types >
-  constexpr Step < decltype(Eq_lambda), types ... > Eq (types ... args) noexcept
-  {
-    return Step < decltype(Eq_lambda), types ... >(Eq_lambda, args ...);
-  }
-
-  template < typename ... types >
-  constexpr Step < decltype(NEq_lambda), types ... > NEq (types ... args) noexcept
-  {
-    return Step < decltype(NEq_lambda), types ... >(NEq_lambda, args ...);
-  }
-
-  template < typename ... types >
-  constexpr Step < decltype(Greater_lambda), types ... > Greater (types ... args) noexcept
-  {
-    return Step < decltype(Greater_lambda), types ... >(Greater_lambda, args ...);
-  }
-
-  template < typename ... types >
-  constexpr Step < decltype(Lower_lambda), types ... > Lower (types ... args) noexcept
-  {
-    return Step < decltype(Lower_lambda), types ... >(Lower_lambda, args ...);
-  }
-
-} // end namespace
-
-
-namespace utils
-{
-
-template < class U >
-constexpr bool is_step () noexcept
-{
-  if constexpr (details :: is_instance < U, Step > :: value)
-    return !std :: is_same_v < typename U :: lambda_func, decltype(math :: Input) >;
-
-  return false;
-}
-
-template < class U >
-constexpr bool is_variable () noexcept
-{
-  if constexpr (is_step < U >())
-    return std :: is_same_v < typename U :: lambda_func, decltype(math :: Input) >;
-
-  return true;
-}
-
-} // end namespace
-
 
 #endif // __step_hpp__

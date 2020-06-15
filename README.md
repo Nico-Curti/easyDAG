@@ -2,6 +2,8 @@
 |:------------:|:-----------:|:----------------:|:----------------:|
 | [**N. Curti**](https://github.com/Nico-Curti) <br/> [**E. Giampieri**](https://github.com/EnricoGiampieri)   |  **easyDAG**  | **Linux/MacOS** : [![travis](https://travis-ci.com/Nico-Curti/easyDAG.svg?branch=master)](https://travis-ci.com/Nico-Curti/easyDAG) <br/> **Windows** : [![appveyor](https://ci.appveyor.com/api/projects/status/exx9gbp6blyggdmg?svg=true)](https://ci.appveyor.com/project/Nico-Curti/easydag) | **Codacy** : [![Codacy](https://api.codacy.com/project/badge/Grade/8d261e840f664c5fa9bf3e1c09509085)](https://www.codacy.com/manual/Nico-Curti/easyDAG?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Nico-Curti/easyDAG&amp;utm_campaign=Badge_Grade) |
 
+![easyDAG CI](https://github.com/Nico-Curti/easyDAG/workflows/easyDAG%20CI/badge.svg)
+
 [![GitHub pull-requests](https://img.shields.io/github/issues-pr/Nico-Curti/easyDAG.svg?style=plastic)](https://github.com/Nico-Curti/easyDAG/pulls)
 [![GitHub issues](https://img.shields.io/github/issues/Nico-Curti/easyDAG.svg?style=plastic)](https://github.com/Nico-Curti/easyDAG/issues)
 

@@ -285,6 +285,8 @@ A full list of default lambda math-functions is provided in the [math.hpp](https
 
 In the [graph.cpp](https://github.com/Nico-Curti/easyDAG/blob/master/example/graph.cpp) example we show how you can use easyDAG to visualize your DAG scheme using DOT.
 
+<img align="right" src="img/reduction.png" width="30%">
+
 ```cpp
 const int N = 10;
 const std :: string pipeline_name = "pipeline";
@@ -339,8 +341,6 @@ reduction.graph(std :: cout, pipeline_name);
 ```
 
 We set a name to each step (the default value is just `Step`).
-
-<img align="right" src="img/reduction.png" width="30%">
 
 The work-flow can be summarized as:
 
@@ -401,7 +401,7 @@ auto result = sum_step();
 std :: cout << "Summation result: " << result << std :: endl;
 
 // Re-calling the same evaluation the lambdas are not recomputed (aka no cout)!
-std :: cout << "Re-called summ value: " << sum_step () << std :: endl;
+std :: cout << "Re-called sum value: " << sum_step () << std :: endl;
 
 // But also if we use common steps they do not need to be re-computed!
 std :: cout << "Product result: " << prod_step() << std :: endl;

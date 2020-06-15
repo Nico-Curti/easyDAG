@@ -60,7 +60,7 @@ int main ()
 
   // Re-calling the same evaluation the lambdas are not recomputed (aka no cout)!
 
-  std :: cout << "Re-called summ value: " << sum_step () << std :: endl;
+  std :: cout << "Re-called sum value: " << sum_step () << std :: endl;
 
   // But also if we use common steps they do not need to be re-computed!
 

@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.9)
 
-# rFBP Version
+# DAG Version
 set (DAG_MAJOR    1)
 set (DAG_MINOR    0)
 set (DAG_REVISION 0)
@@ -169,8 +169,17 @@ if (BUILD_TEST)
   add_subdirectory(${TEST_DIR})
 endif()
 
-# add_executable(runtest ${EXAMPLE}/runtest.cpp ${HEADER} ${HPP})
-# target_link_libraries(runtest ${linked_libs})# ${DAGlib})
+add_custom_target(example_algebra)
+add_executable(algebra ${EXAMPLE}/algebra.cpp ${HEADER} ${HPP})
+target_link_libraries(algebra ${linked_libs})# ${DAGlib})
+
+add_custom_target(example_graph)
+add_executable(graph ${EXAMPLE}/graph.cpp ${HEADER} ${HPP})
+target_link_libraries(graph ${linked_libs})# ${DAGlib})
+
+add_custom_target(example_cached)
+add_executable(cached ${EXAMPLE}/cached.cpp ${HEADER} ${HPP})
+target_link_libraries(cached ${linked_libs})# ${DAGlib})
 
 
 #################################################################
@@ -185,8 +194,12 @@ endif()
 #                                COMPONENT dev
 #                                )
 
+install(TARGETS algebra      DESTINATION ${OUT_DIR})
+install(TARGETS graph        DESTINATION ${OUT_DIR})
+install(TARGETS cached       DESTINATION ${OUT_DIR})
+
 # #################################################################
-# #                          EXPORT RFBP                          #
+# #                          EXPORT DAG                          #
 # #################################################################
 #
 # install (EXPORT DAGTargets
@@ -198,15 +211,15 @@ endif()
 # # Export the package for use from the build-tree (this registers the build-tree with a global CMake-registry)
 # export (PACKAGE DAG)
 #
-# # Create the rFBPConfig.cmake
+# # Create the DAGConfig.cmake
 # # First of all we compute the relative path between the cmake config file and the include path
 # file (RELATIVE_PATH REL_INCLUDE_DIR "${INST_DIR}" "${LIB_DIR}/include")
 # set (CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}")
 # configure_file (DAGConfig.cmake.in "${PROJECT_BINARY_DIR}/DAGConfig.cmake" @ONLY)
-# set (CONF_INCLUDE_DIRS "\${rFBP_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+# set (CONF_INCLUDE_DIRS "\${DAG_CMAKE_DIR}/${REL_INCLUDE_DIR}")
 # configure_file (DAGConfig.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/DAGConfig.cmake" @ONLY)
 #
-# # Create the rFBPConfigVersion.cmake
+# # Create the DAGConfigVersion.cmake
 # include(CMakePackageConfigHelpers)
 # write_basic_package_version_file ("${PROJECT_BINARY_DIR}/DAGConfigVersion.cmake"
 #                                   COMPATIBILITY SameMajorVersion

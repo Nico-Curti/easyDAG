@@ -18,11 +18,12 @@
 
 # easy Direct Acyclic Graph Scheduler
 
-C++ version of the original [easyDAG](https://github.com/eDIMESLab/easyDAG) project in Python.
+Modern C++ parallel scheduler. This project is the optimization and extension of the original [easyDAG](https://github.com/eDIMESLab/easyDAG) project in Python.
 
 * [Prerequisites](#prerequisites)
 * [Installation](#installation)
 * [Usage](#usage)
+* [Testing](#testing)
 * [Contribution](#contribution)
 * [References](#references)
 * [Authors](#authors)
@@ -61,7 +62,7 @@ PS \>                 ./build.ps1
 
 ### Ubuntu
 
-1) Define a work folder, which we will call WORKSPACE in this tutorial: this could be a "Code" folder in our home, a "c++" folder on our desktop, whatever you want. Create it if you don't already have, using your favourite method (mkdir in bash, or from the graphical interface of your distribution). We will now define an environment variable to tell the system where our folder is. Please note down the full path of this folder, which will look like `/home/$(whoami)/code/`
+1) Define a work folder, which we will call WORKSPACE in this tutorial: this could be a "Code" folder in our home, a "c++" folder on our desktop, whatever you want. Create it if you don't already have, using your favorite method (mkdir in bash, or from the graphical interface of your distribution). We will now define an environment variable to tell the system where our folder is. Please note down the full path of this folder, which will look like `/home/$(whoami)/code/`
 
 ```bash
 echo -e "\n export WORKSPACE=/full/path/to/my/folder \n" >> ~/.bashrc
@@ -84,7 +85,7 @@ git config --global core.autocrlf input
 git clone https://github.com/physycom/sysconfig
 ```
 
-3) Build the project with CMake (enable or disable OMP with the define **-DOMP**:
+3) Build the project with CMake:
 
 ```bash
 cd $WORKSPACE
@@ -119,7 +120,7 @@ brew install gcc@8
 brew install cmake make git ninja
 ```
 
-4) Define a work folder, which we will call WORKSPACE in this tutorial: this could be a "Code" folder in our home, a "c++" folder on our desktop, whatever you want. Create it if you don't already have, using your favourite method (mkdir in bash, or from the graphical interface in Finder). We will now define an environment variable to tell the system where our folder is. Please note down the full path of this folder, which will look like /home/$(whoami)/code/
+4) Define a work folder, which we will call WORKSPACE in this tutorial: this could be a "Code" folder in our home, a "c++" folder on our desktop, whatever you want. Create it if you don't already have, using your favorite method (mkdir in bash, or from the graphical interface in Finder). We will now define an environment variable to tell the system where our folder is. Please note down the full path of this folder, which will look like /home/$(whoami)/code/
 
 5) Open a Terminal and type the following command (replace /full/path/to/my/folder with the previous path noted down)
 
@@ -168,7 +169,7 @@ PS \>                 cinst -y git cmake powershell
 
 7) Activate license for PGI 18.10 Community Edition (rename the file `%PROGRAMFILES%\PGI\license.dat-COMMUNITY-18.10` to `%PROGRAMFILES%\PGI\license.dat`) if necessary, otherwise enable a Professional License if available
 
-8) Define a work folder, which we will call `WORKSPACE` in this tutorial: this could be a "Code" folder in our home, a "cpp" folder on our desktop, whatever you want. Create it if you don't already have, using your favourite method (mkdir in Powershell, or from the graphical interface in explorer). We will now define an environment variable to tell the system where our folder is. Please note down its full path. Open a Powershell (as a standard user) and type
+8) Define a work folder, which we will call `WORKSPACE` in this tutorial: this could be a "Code" folder in our home, a "cpp" folder on our desktop, whatever you want. Create it if you don't already have, using your favorite method (mkdir in Powershell, or from the graphical interface in explorer). We will now define an environment variable to tell the system where our folder is. Please note down its full path. Open a Powershell (as a standard user) and type
 
 ```PowerShell
 PS \>                 rundll32 sysdm.cpl,EditEnvironmentVariables
@@ -237,6 +238,11 @@ if you are working on a Windows machine the right script to call is the [`build.
 
 ## Usage
 
+The following [algebra.cpp](https://github.com/Nico-Curti/easyDAG/blob/master/example/algebra.cpp) example shows the basic APIs of **easyDAG**
+
+
+<img align="right" src="img/algebra.png" width="30%">
+
 ```c++
 #include <step.hpp>
 #include <iostream>
@@ -248,25 +254,224 @@ int main ()
 
   float y1 = 2.f;
   float y2 = 4.f;
+                               //                     ___ a
+  InputVariable a(x1);         //                   |
+  InputVariable b(x2);         //          __ mul_1 *
+  InputVariable c(y1);         //        |          |____ b
+  InputVariable d(y2);         //        |
+                               // sum __ +
+  auto mul_1 = a * d;          //        |           ____ c
+  auto mul_2 = b * c;          //        |          |
+  auto sum = mul_1 + mul_2;    //        ____ mul_2 *
+                               //                   |____ d
 
-  InputVariable a(x1);
-  InputVariable b(x2);
-  InputVariable c(y1);
-  InputVariable d(y2);
-
-  auto mul_1 = a * d;
-  auto mul_2 = b * c;
-  auto sum_1 = mul_1 + mul_2;
-
-  std :: cout << "(a * d) + (b * c) = " << sum_1() << std :: endl;
+  std :: cout << "(a * d) + (b * c) = " << sum() << std :: endl;
   // (a * d) + (b * c) = 8.f
 
   auto equation = (a * d) + (b * c);
-  assert (equation() == sum_1());
+  assert (equation() == sum());
 
   return 0;
 }
 ```
+
+The DAG is automatically evaluated using the template recursion of the Step object.
+
+The result evaluation is performed asynchronously using future variables (in this case is useless this kind of optimization!).
+
+A full list of default lambda math-functions is provided in the [math.hpp](https://github.com/Nico-Curti/easyDAG/blob/master/hpp/math.hpp) file.
+
+### View Graph
+
+In the [graph.cpp](https://github.com/Nico-Curti/easyDAG/blob/master/example/graph.cpp) example we show how you can use easyDAG to visualize your DAG scheme using DOT.
+
+```cpp
+const int N = 10;
+const std :: string pipeline_name = "pipeline";
+
+auto init = [](const int & N)
+            {
+              std :: vector < float > x(N);
+              return x;
+            };
+
+auto fill = [](std :: vector < float > x)
+            {
+              std :: fill(x.begin(), x.end(), 1.f);
+              return x;
+            };
+
+auto concat = [](std :: vector < float > x, std :: vector < float > y)
+              {
+                std :: vector < float > res(x.size() + y.size());
+                std :: copy_n(x.begin(), x.size(), res.begin());
+                std :: copy_n(y.begin(), y.size(), res.begin() + x.size());
+                return res;
+              };
+
+auto reduce = [](std :: vector < float > res)
+                {
+                  return std :: accumulate(res.begin(), res.end(), 0.f);
+                };
+
+auto size = InputVariable(N);
+size.set_name(size);
+
+Step init_x(init, size);
+Step init_y(init, size);
+
+init_x.set_name(init_x);
+init_y.set_name(init_y);
+
+Step fill_x(fill, init_x);
+Step fill_y(fill, init_y);
+
+fill_x.set_name(fill_x);
+fill_y.set_name(fill_y);
+
+Step concatenate(concat, fill_x, fill_y);
+concatenate.set_name(concatenate);
+
+Step reduction(reduce, concatenate);
+reduction.set_name(reduction);
+
+reduction.graph(std :: cout, pipeline_name);
+```
+
+We set a name to each step (the default value is just `Step`).
+
+<img align="right" src="img/reduction.png" width="30%">
+
+The work-flow can be summarized as:
+
+* we create two vectors starting from just a dimension size;
+* we fill the two vectors with some values;
+* we concatenate them;
+* we apply a sum reduction.
+
+The DAG is written in the stdout in the DOT format so if you want to visualize the png you can re-direct the stdout to a file and use the command:
+
+```bash
+dot -Tpng graph.dot > reduction.png
+```
+
+**Note:** The default settings highlight computational step as boxes while variables as circle nodes.
+
+### Cached values
+
+In the [cached.cpp](https://github.com/Nico-Curti/easyDAG/blob/master/example/cached.cpp) example we proof the usage of cached values into the DAG evaluation.
+
+<img align="right" src="img/cached.png" width="30%">
+
+```cpp
+const int N = 10;
+
+auto init = [&](const int & N)
+            {
+              std :: cout << "I'm the initializer" << std :: endl;
+              float * x = new float[N];
+              return x;
+            };
+auto fill = [&](float * x)
+            {
+              std :: cout << "I'm the filler" << std :: endl;
+              std :: fill_n(x, N, 1.f);
+              return x;
+            };
+auto sum  = [&](float * x)
+            {
+              std :: cout << "I'm the sum reduction" << std :: endl;
+              return std :: accumulate(x, x + N, 0.f);
+            };
+
+auto prod = [&](float * x)
+            {
+              std :: cout << "I'm the prod reduction" << std :: endl;
+              return std :: accumulate(x, x + N, 1.f, std :: multiplies < float >());
+            };
+
+auto a = InputVariable(N);
+
+Step init_step(init, a);
+Step fill_step(fill, init_step);
+Step sum_step(sum, fill_step);
+Step prod_step(prod, fill_step);
+
+auto result = sum_step();
+std :: cout << "Summation result: " << result << std :: endl;
+
+// Re-calling the same evaluation the lambdas are not recomputed (aka no cout)!
+std :: cout << "Re-called summ value: " << sum_step () << std :: endl;
+
+// But also if we use common steps they do not need to be re-computed!
+std :: cout << "Product result: " << prod_step() << std :: endl;
+```
+
+If the DAG has been already evaluated its dependencies are not re-computed.
+
+In this way long computations but also common steps do not need to be evaluated several times!
+
+### Useful API
+
+The [helper.h](https://github.com/Nico-Curti/easyDAG/blob/master/include/helper.h) and [utils.h](https://github.com/Nico-Curti/easyDAG/blob/master/include/utils.h) scripts include some useful APIs to manage `Step` variables.
+
+First of all you can check the type of the current variable with
+
+```cpp
+float x = 2.f;
+int y = 2;
+auto a = InputVariable(x);
+auto b = InputVariable < decltype(y) > ();
+
+auto sum1 = a + b;
+
+static_assert ( utils :: is_variable < decltype(x)    >() == true,  "It is a variable");
+static_assert ( utils :: is_variable < decltype(a)    >() == true,  "It is a variable");
+static_assert ( utils :: is_variable < decltype(b)    >() == true,  "It is a variable");
+static_assert ( utils :: is_variable < decltype(sum1) >() == false, "It is not a variable");
+static_assert ( utils :: is_step     < decltype(x)    >() == false, "It is not a step");
+static_assert ( utils :: is_step     < decltype(a)    >() == false, "It is not a step");
+static_assert ( utils :: is_step     < decltype(b)    >() == false, "It is not a step");
+static_assert ( utils :: is_step     < decltype(sum1) >() == true,  "It is a step");
+```
+
+In this way you can check at **compile time** the variable types.
+
+If you have already build a DAG you can be interested about the number of operations involved in the computation.
+
+To this purpose the `utils :: OperationCount` can summarize you these kind of information. For example:
+
+```cpp
+float x1  = 10.f;
+double x2 = 2.;
+
+float y1 = 3.f;
+float y2 = 4.f;
+
+auto a = InputVariable(x1);
+auto b = InputVariable(x2);
+auto c = InputVariable(y1);
+auto d = InputVariable(y2);
+
+auto sum = (a * b) + (c + d) + x1;
+
+auto cnt = utils :: OperationCount < decltype(sum) >();
+
+std :: cout << "The current DAG has " << cnt.num_variables  << " variables" << std :: endl;
+std :: cout << "The current DAG has " << cnt.num_operations << " operations" << std :: endl;
+std :: cout << "The current DAG has " << cnt.num_nodes      << " nodes" << std :: endl;
+
+// The current DAG has 5 variables
+// The current DAG has 4 operations
+// The current DAG has 9 nodes
+```
+
+## Testing
+
+`easyDAG` uses CMake to build a full list of tests. You can disable tests setting the `-DBUILD_TEST=OFF` during the building.
+All the test are performed using the [`Catch2`](https://github.com/catchorg/Catch2/) (v2.11.0) library.
+
+The test scripts can be found [here](https://github.com/Nico-Curti/easyDAG/blob/master/test).
 
 ## Contribution
 
@@ -280,8 +485,9 @@ See [here](https://github.com/Nico-Curti/easyDAG/blob/master/CONTRIBUTING.md) fo
 
 ## Authors
 
-* **Nico Curti** [git](https://github.com/Nico-Curti), [unibo](https://www.unibo.it/sitoweb/nico.curti2)
-* **Enrico Giampieri** [git](https://github.com/EnricoGiampieri), [unibo](https://www.unibo.it/sitoweb/enrico.giampieri)
+* <img src="https://avatars0.githubusercontent.com/u/24650975?s=400&v=4" width="25px"> **Nico Curti** [git](https://github.com/Nico-Curti), [unibo](https://www.unibo.it/sitoweb/nico.curti2)
+
+* <img src="https://avatars2.githubusercontent.com/u/1419337?s=400&v=4" width="25px;"/> **Enrico Giampieri** [git](https://github.com/EnricoGiampieri)
 
 See also the list of [contributors](https://github.com/Nico-Curti/easyDAG/contributors) [![GitHub contributors](https://img.shields.io/github/contributors/Nico-Curti/easyDAG.svg?style=plastic)](https://github.com/Nico-Curti/easyDAG/graphs/contributors/) who participated in this project.
 

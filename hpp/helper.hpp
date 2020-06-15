@@ -4,15 +4,15 @@
 #include <helper.h>
 
 template < std :: size_t I, char symbol, typename ... Tp >
-void print ( std :: tuple < Tp ... > & t )
+void print ( std :: ostream & os, std :: tuple < Tp ... > & t )
 {
   if constexpr (I > 0)
   {
-    std :: cout << std :: get < I >(t) << " " << symbol << " ";
-    print < I - 1, symbol, Tp ... >(t);
+    os << std :: get < I >(t) << " " << symbol << " ";
+    print < I - 1, symbol, Tp ... >(os, t);
   }
   else
-    std :: cout << std :: get < I >(t) << " ";
+    os << std :: get < I >(t) << " ";
 }
 
 template < class T >

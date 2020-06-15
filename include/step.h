@@ -1,11 +1,12 @@
 #ifndef __step_h__
 #define __step_h__
 
-#include <iostream>
-#include <utility>
-#include <functional>
 #include <tuple>
 #include <future>
+#include <string>
+#include <utility>
+#include <iostream>
+#include <functional>
 
 #include <math.hpp>
 
@@ -28,6 +29,10 @@ class Step
 
   constexpr decltype(auto) evaluate () noexcept; // "alias" of operator ()
 
+  template < std :: size_t idx = 0 >
+  constexpr void dump_impl (std :: ostream & os) noexcept;
+
+
 public:
 
   using lambda_func = lambda;
@@ -39,6 +44,10 @@ public:
   // setter function
 
   constexpr void set (types & ... args) noexcept;
+
+  #define set_name(var) name(#var)
+
+  constexpr void name (const std :: string & n) noexcept;
 
   // eval method
 
@@ -56,6 +65,8 @@ public:
   static constexpr auto num_variables () noexcept;
   static constexpr auto num_operations () noexcept;
   static constexpr auto size () noexcept;
+
+  constexpr std :: string get_name () noexcept;
 
   // math operators
 
@@ -82,7 +93,10 @@ public:
   // IO operator
 
   template < typename _lambda, typename ... _types >
-  friend std :: ostream & operator << (std :: ostream & os, const Step < _lambda, _types ... > & x);
+  friend std :: ostream & operator << (std :: ostream & os, Step < _lambda, _types ... > x);
+
+  constexpr void dump (std :: ostream & os) noexcept;
+  constexpr void graph (std :: ostream & os, const std :: string & graph_name) noexcept;
 
 private:
 
@@ -92,6 +106,8 @@ private:
 
   // with a shared_future the value is automatically cached
   std :: shared_future < eval_t > value;
+
+  std :: string _name;
 
 };
 

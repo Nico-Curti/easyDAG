@@ -181,6 +181,9 @@ add_custom_target(example_cached)
 add_executable(cached ${EXAMPLE}/cached.cpp ${HEADER} ${HPP})
 target_link_libraries(cached ${linked_libs})# ${DAGlib})
 
+add_custom_target(example_condition)
+add_executable(condition ${EXAMPLE}/condition.cpp ${HEADER} ${HPP})
+target_link_libraries(condition ${linked_libs})# ${DAGlib})
 
 #################################################################
 #                          INSTALLERS                           #
@@ -197,6 +200,7 @@ target_link_libraries(cached ${linked_libs})# ${DAGlib})
 install(TARGETS algebra      DESTINATION ${OUT_DIR})
 install(TARGETS graph        DESTINATION ${OUT_DIR})
 install(TARGETS cached       DESTINATION ${OUT_DIR})
+install(TARGETS condition    DESTINATION ${OUT_DIR})
 
 # #################################################################
 # #                          EXPORT DAG                          #

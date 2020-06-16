@@ -9,7 +9,11 @@
 
 
 template < typename lambda, typename ... types >
-Step < lambda, types ... > :: Step (lambda & func, types & ... args) : func (std :: forward < lambda >(func)), args (std :: tie(args ...)), value ( std :: async ( std :: launch :: async, & Step < lambda, types ... > :: evaluate, this ) ), _name ("Step")
+Step < lambda, types ... > :: Step (lambda & func, types & ... args) : func (std :: forward < lambda >(func)), args (std :: tie(args ...)),
+#ifndef __clang__
+                                                                       value ( std :: async ( std :: launch :: async, & Step < lambda, types ... > :: evaluate, this ) ),
+#endif
+                                                                       _name ("Step")
 {
 }
 
@@ -63,7 +67,7 @@ constexpr auto Step < lambda, types ... > :: size () noexcept
 }
 
 template < typename lambda, typename ... types >
-constexpr std :: string Step < lambda, types ... > :: get_name () noexcept
+std :: string Step < lambda, types ... > :: get_name ()
 {
   return this->_name;
 }
@@ -98,7 +102,16 @@ constexpr decltype(auto) Step < lambda, types ... > :: evaluate () noexcept
 template < typename lambda, typename ... types >
 constexpr decltype(auto) Step < lambda, types ... > :: operator () () noexcept
 {
+
+#ifndef __clang__
+
   return this->value.get();
+
+#else
+
+  return this->evaluate();
+
+#endif
 }
 
 template < typename lambda, typename ... types >
@@ -111,7 +124,12 @@ template < typename lambda, typename ... types >
 constexpr void Step < lambda, types ... > :: set (types & ... args) noexcept
 {
   this->args = std :: tuple < types ... >(args ... );
+
+#ifndef __clang__
+
   this->value = std :: async ( std :: launch :: async, & Step < lambda, types ... > :: evaluate, this );
+
+#endif
 }
 
 template < typename lambda, typename ... types >

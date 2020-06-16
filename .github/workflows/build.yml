@@ -41,31 +41,31 @@ jobs:
 
 
 
-#  osx-cmake:
-#    runs-on: macOS-latest
-#
-#    steps:
-#    - uses: actions/checkout@v2
-#
-#    - name: 'Update apt'
-#      run: brew update
-#
-#    - name: 'Configure build'
-#      run: |
-#        mkdir buildDirectory_debug
-#        cd buildDirectory_debug
-#        cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="Debug"
-#        cd ..
-#        mkdir buildDirectory_release
-#        cd buildDirectory_release
-#        cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="Release"
-#        cd ..
-#
-#    - name: 'Build'
-#      run: |
-#        cd buildDirectory_debug
-#        cmake --build . --target install -- -j8
-#        cd ..
-#        cd buildDirectory_release
-#        cmake --build . --target install -- -j8
-#        cd ..
+  osx-cmake:
+    runs-on: macOS-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: 'Update apt'
+      run: brew update
+
+    - name: 'Configure build'
+      run: |
+        mkdir buildDirectory_debug
+        cd buildDirectory_debug
+        cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="Debug"
+        cd ..
+        mkdir buildDirectory_release
+        cd buildDirectory_release
+        cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="Release"
+        cd ..
+
+    - name: 'Build'
+      run: |
+        cd buildDirectory_debug
+        cmake --build . --target install -- -j8
+        cd ..
+        cd buildDirectory_release
+        cmake --build . --target install -- -j8
+        cd ..

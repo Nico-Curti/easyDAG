@@ -25,7 +25,7 @@ namespace details
     static std :: false_type test ( ... );
 
     static const bool value = decltype( test < T > (0) ) :: value;
-};
+  };
 
 }
 

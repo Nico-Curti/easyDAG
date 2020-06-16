@@ -66,7 +66,7 @@ public:
   static constexpr auto num_operations () noexcept;
   static constexpr auto size () noexcept;
 
-  constexpr std :: string get_name () noexcept;
+  std :: string get_name ();
 
   // math operators
 
@@ -102,10 +102,14 @@ private:
 
   // other Private members
 
+#ifndef __clang__
+
   using eval_t = typename std :: result_of < decltype(& Step < lambda, types ... > :: evaluate)( Step < lambda, types ... > ) > :: type;
 
   // with a shared_future the value is automatically cached
   std :: shared_future < eval_t > value;
+
+#endif
 
   std :: string _name;
 

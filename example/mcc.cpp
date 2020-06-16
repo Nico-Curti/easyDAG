@@ -14,38 +14,40 @@ int main ()
   const int Nlabels = 12;
   int Nclass;
 
-  std :: shared_ptr < int[] > y_true(new int[Nlabels]);
+  int * y_true = new int[Nlabels];
   y_true[0] = 2;  y_true[1] = 0;  y_true[2] = 2;  y_true[3] = 2;  y_true[4] = 0;   y_true[5] = 1;
   y_true[6] = 1;  y_true[7] = 2;  y_true[8] = 2;  y_true[9] = 0;  y_true[10] = 1;  y_true[11] = 2;
 
-  std :: shared_ptr < int[] > y_pred(new int[Nlabels]);
+  int * y_pred = new int[Nlabels];
   y_pred[0] = 0;  y_pred[1] = 0;  y_pred[2] = 2;  y_pred[3] = 1;  y_pred[4] = 0;   y_pred[5] = 2;
   y_pred[6] = 1;  y_pred[7] = 0;  y_pred[8] = 2;  y_pred[9] = 0;  y_pred[10] = 2;  y_pred[11] = 2;
 
 
-  auto get_classes = [&] (const std :: shared_ptr < int[] > & lbl_true, const std :: shared_ptr < int[] > & lbl_pred, const int & n_true, const int & n_pred)
+  auto get_classes = [&] (const int * lbl_true, const int * lbl_pred, const int & n_true, const int & n_pred)
   {
-    std :: set < int > u1 (lbl_true.get(), lbl_true.get() + n_true);
-    std :: set < int > u2 (lbl_pred.get(), lbl_pred.get() + n_pred);
+    std :: set < int > u1 (lbl_true, lbl_true + n_true);
+    std :: set < int > u2 (lbl_pred, lbl_pred + n_pred);
 
     std :: vector < float > classes (u1.size() + u2.size());
     auto it = std :: set_union(u1.begin(), u1.end(), u2.begin(), u2.end(), classes.begin());
     classes.resize(it - classes.begin());
 
-    std :: shared_ptr < float[] > res(new float[classes.size()]);
-    std :: move(classes.begin(), classes.end(), res.get());
+    Nclass = static_cast < int >(classes.size());
+
+    float * res = new float[classes.size()];
+    std :: move(classes.begin(), classes.end(), res);
 
     return res;
   };
 
-  auto get_confusion_matrix = [] (const std :: shared_ptr < int[] > & lbl_true, const std :: shared_ptr < int[] > & lbl_pred, const int & n_lbl, const std :: shared_ptr < float[] > & classes, const int & Nclass)
+  auto get_confusion_matrix = [] (const int * lbl_true, const int * lbl_pred, const int & n_lbl, const float * classes, const int & Nclass)
   {
-    std :: shared_ptr < float[] > confusion_matrix(new float[Nclass * Nclass]);
+    float * confusion_matrix = new float[Nclass * Nclass];
 
-    std :: fill_n(confusion_matrix.get(), Nclass * Nclass, 0.f);
+    std :: fill_n(confusion_matrix, Nclass * Nclass, 0.f);
 
-    auto start = classes.get();
-    auto end   = classes.get() + Nclass;
+    auto start = classes;
+    auto end   = classes + Nclass;
 
     int i1 = 0;
     int i2 = 0;
@@ -59,9 +61,9 @@ int main ()
     return confusion_matrix;
   };
 
-  auto get_TP = [] (const std :: shared_ptr < float[] > & confusion_matrix, const int & Nclass)
+  auto get_TP = [] (const float * confusion_matrix, const int & Nclass)
   {
-    std :: shared_ptr < float[] > TP(new float[Nclass]);
+    float * TP = new float[Nclass];
 
     for (int i = 0; i < Nclass; ++i)
       TP[i] = confusion_matrix[i * Nclass + i];
@@ -69,24 +71,24 @@ int main ()
     return TP;
   };
 
-  auto get_FN = [] (const std :: shared_ptr < float[] > & confusion_matrix, const int & Nclass)
+  auto get_FN = [] (const float * confusion_matrix, const int & Nclass)
   {
-    std :: shared_ptr < float[] > FN(new float[Nclass]);
+    float * FN = new float[Nclass];
 
     for (int i = 0; i < Nclass; ++i)
     {
       const int N = i * Nclass;
-      FN[i] = std :: accumulate(confusion_matrix.get() + N, confusion_matrix.get() + N + i, 0.f) +
-              std :: accumulate(confusion_matrix.get() + N + i + 1, confusion_matrix.get() + N + Nclass, 0.f);
+      FN[i] = std :: accumulate(confusion_matrix + N, confusion_matrix + N + i, 0.f) +
+              std :: accumulate(confusion_matrix + N + i + 1, confusion_matrix + N + Nclass, 0.f);
     }
     return FN;
   };
 
-  auto get_FP = [] (const std :: shared_ptr < float[] > & confusion_matrix, const int & Nclass)
+  auto get_FP = [] (const float * confusion_matrix, const int & Nclass)
   {
-    std :: shared_ptr < float[] > FP(new float[Nclass]);
+    float * FP = new float[Nclass];
 
-    std :: fill_n(FP.get(), Nclass, 0.f);
+    std :: fill_n(FP, Nclass, 0.f);
 
     for (int i = 0; i < Nclass; ++i)
       for (int j = 0; j < Nclass; ++j)
@@ -95,23 +97,23 @@ int main ()
     return FP;
   };
 
-  auto get_TOP = [] (const std :: shared_ptr < float[] > & TP, const std :: shared_ptr < float[] > & FP, const int & Nclass)
+  auto get_TOP = [] (const float * TP, const float * FP, const int & Nclass)
   {
-    std :: shared_ptr < float[] > TOP (new float[Nclass]);
-    std :: transform(TP.get(), TP.get() + Nclass, FP.get(), TOP.get(), [](const float & tp, const float & fp){return tp + fp;});
+    float * TOP = new float[Nclass];
+    std :: transform(TP, TP + Nclass, FP, TOP, [](const float & tp, const float & fp){return tp + fp;});
     return TOP;
   };
 
-  auto get_P = [] (const std :: shared_ptr < float[] > & TP, const std :: shared_ptr < float[] > & FN, const int & Nclass)
+  auto get_P = [] (const float * TP, const float * FN, const int & Nclass)
   {
-    std :: shared_ptr < float[] > P (new float[Nclass]);
-    std :: transform(TP.get(), TP.get() + Nclass, FN.get(), P.get(), [](const float & tp, const float & fn){return tp + fn;});
+    float * P = new float[Nclass];
+    std :: transform(TP, TP + Nclass, FN, P, [](const float & tp, const float & fn){return tp + fn;});
     return P;
   };
 
-  auto get_overall_MCC = [] (const std :: shared_ptr < float[] > & confusion_matrix, const std :: shared_ptr < float[] > & TOP, const std :: shared_ptr < float[] > & P, const int & Nclass)
+  auto get_overall_MCC = [] (const float * confusion_matrix, const float * TOP, const float * P, const int & Nclass)
   {
-    const float s = std :: accumulate(TOP.get(), TOP.get() + Nclass, 0.f);
+    const float s = std :: accumulate(TOP, TOP + Nclass, 0.f);
     float cov_x_y = 0.f;
     float cov_x_x = 0.f;
     float cov_y_y = 0.f;
@@ -144,6 +146,7 @@ int main ()
   classes.set_name(classes);
 
   // set the Nclass as step for printing
+  classes();
   n_class.set(Nclass);
 
   // Compute the confusion matrix

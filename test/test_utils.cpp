@@ -179,5 +179,18 @@ TEST_CASE ( "Test operation_graph", "[graph_op]" )
   std :: stringstream os;
   mul_1.graph(os, "pipeline");
 
-  REQUIRE ( os.str() == "digraph pipeline {\n  mul_1[shape=box, style=filled,color=\".7 .3 1.0\"]\n  mul_1 -> add_1\n  mul_1 -> add_2\n  add_2[shape=box, style=filled,color=\".7 .3 1.0\"]\n  add_2 -> c\n  add_2 -> d\n  add_2 -> a\n  add_1[shape=box, style=filled,color=\".7 .3 1.0\"]\n  add_1 -> a\n  add_1 -> b\n}\n" );
+  std :: string true_pipe = "digraph pipeline {\n\
+  mul_1[shape=box, style=filled,color=\".7 .3 1.0\"]\n\
+  mul_1 -> add_2\n\
+  add_2[shape=box, style=filled,color=\".7 .3 1.0\"]\n\
+  add_2 -> a\n\
+  add_2 -> d\n\
+  add_2 -> c\n\
+  mul_1 -> add_1\n\
+  add_1[shape=box, style=filled,color=\".7 .3 1.0\"]\n\
+  add_1 -> b\n\
+  add_1 -> a\n\
+}\n";
+
+  REQUIRE ( os.str() == true_pipe );
 }

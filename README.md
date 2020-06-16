@@ -38,7 +38,7 @@ The package installation can be performed via [`CMake`](https://github.com/Nico-
 
 ## Installation
 
-1) Follow your system prerequisites (below)
+1) Follow your system prerequisites [here](https://github.com/Nico-Curti/easyDAG/blob/master/docs/install.md).
 
 2) Clone the `easyDAG` package from this repository, or download a stable release
 
@@ -58,154 +58,6 @@ Example:
 **Windows OS:**
 ```Powershell
 PS \>                 ./build.ps1
-```
-
-### Ubuntu
-
-1) Define a work folder, which we will call WORKSPACE in this tutorial: this could be a "Code" folder in our home, a "c++" folder on our desktop, whatever you want. Create it if you don't already have, using your favorite method (mkdir in bash, or from the graphical interface of your distribution). We will now define an environment variable to tell the system where our folder is. Please note down the full path of this folder, which will look like `/home/$(whoami)/code/`
-
-```bash
-echo -e "\n export WORKSPACE=/full/path/to/my/folder \n" >> ~/.bashrc
-source ~/.bashrc
-```
-
-2) Open a Bash terminal and type the following commands to install all the prerequisites.
-
-```bash
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-sudo apt-get update
-sudo apt-get install -y gcc-8 g++-8
-
-wget --no-check-certificate https://cmake.org/files/v3.13/cmake-3.13.1-Linux-x86_64.tar.gz
-tar -xzf cmake-3.13.1-Linux-x86_64.tar.gz
-export PATH=$PWD/cmake-3.13.1-Linux-x86_64/bin:$PATH
-
-sudo apt-get install -y make git dos2unix ninja-build
-git config --global core.autocrlf input
-git clone https://github.com/physycom/sysconfig
-```
-
-3) Build the project with CMake:
-
-```bash
-cd $WORKSPACE
-git clone https://github.com/Nico-Curti/easyDAG
-cd easyDAG
-
-mkdir -p build
-cd build
-
-cmake ..
-make -j
-cmake --build . --target install
-cd ..
-```
-
-### macOS
-
-1) If not already installed, install the XCode Command Line Tools, typing this command in a terminal:
-
-```bash
-xcode-select --install
-```
-
-2) If not already installed, install Homebrew following the [official guide](https://brew.sh/index_it.html).
-
-3) Open the terminal and type these commands
-
-```bash
-brew update
-brew upgrade
-brew install gcc@8
-brew install cmake make git ninja
-```
-
-4) Define a work folder, which we will call WORKSPACE in this tutorial: this could be a "Code" folder in our home, a "c++" folder on our desktop, whatever you want. Create it if you don't already have, using your favorite method (mkdir in bash, or from the graphical interface in Finder). We will now define an environment variable to tell the system where our folder is. Please note down the full path of this folder, which will look like /home/$(whoami)/code/
-
-5) Open a Terminal and type the following command (replace /full/path/to/my/folder with the previous path noted down)
-
-```bash
-echo -e "\n export WORKSPACE=/full/path/to/my/folder \n" >> ~/.bash_profile
-source ~/.bash_profile
-```
-
-6) Build the project with CMake (enable or disable OMP with the define **-DOMP**:
-
-```bash
-cd $WORKSPACE
-git clone https://github.com/Nico-Curti/easyDAG
-cd easyDAG
-
-mkdir -p build
-cd build
-
-cmake ..
-make -j
-cmake --build . --target install
-cd ..
-```
-
-### Windows (7+)
-
-1) Install Visual Studio 2017 from the [official website](https://www.visualstudio.com/)
-
-2) Open your Powershell with Administrator privileges, type the following command and confirm it:
-
-```PowerShell
-PS \>                 Set-ExecutionPolicy unrestricted
-```
-
-3) If not already installed, please install chocolatey using the [official guide](http://chocolatey.org)
-
-4) If you are not sure about having them updated, or even installed, please install `git`, `cmake` and an updated `Powershell`. To do so, open your Powershell with Administrator privileges and type
-
-```PowerShell
-PS \>                 cinst -y git cmake powershell
-```
-
-5) Restart the PC if required by chocolatey after the latest step
-
-6) Install PGI 18.10 from the [official website](https://www.pgroup.com/products/community.htm) (the community edition is enough and is free; NOTE: install included MS-MPI, but avoid JRE and Cygwin)
-
-7) Activate license for PGI 18.10 Community Edition (rename the file `%PROGRAMFILES%\PGI\license.dat-COMMUNITY-18.10` to `%PROGRAMFILES%\PGI\license.dat`) if necessary, otherwise enable a Professional License if available
-
-8) Define a work folder, which we will call `WORKSPACE` in this tutorial: this could be a "Code" folder in our home, a "cpp" folder on our desktop, whatever you want. Create it if you don't already have, using your favorite method (mkdir in Powershell, or from the graphical interface in explorer). We will now define an environment variable to tell the system where our folder is. Please note down its full path. Open a Powershell (as a standard user) and type
-
-```PowerShell
-PS \>                 rundll32 sysdm.cpl,EditEnvironmentVariables
-```
-
-9) In the upper part of the window that pops-up, we have to create a new environment variable, with name `WORKSPACE` and value the full path noted down before.
-If it not already in the `PATH` (this is possible only if you did it before), we also need to modify the "Path" variable adding the following string (on Windows 10 you need to add a new line to insert it, on Windows 7/8 it is necessary to append it using a `;` as a separator between other records):
-
-```cmd
-                      %PROGRAMFILES%\CMake\bin
-```
-
-10) If `vcpkg` is not installed, please follow the next procedure, otherwise please jump to #12
-
-```PowerShell
-PS \>                 cd $env:WORKSPACE
-PS Code>              git clone https://github.com/Microsoft/vcpkg.git
-PS Code>              cd vcpkg
-PS Code\vcpkg>        .\bootstrap-vcpkg.bat
-```
-
-11) Open a Powershell with Administrator privileges and type
-
-```PowerShell
-PS \>                 cd $env:WORKSPACE
-PS Code>              cd vcpkg
-PS Code\vcpkg>        .\vcpkg integrate install
-```
-
-12) Open a Powershell and build `easyDAG` using the `build.ps1` script
-
-```PowerShell
-PS \>                 cd $env:WORKSPACE
-PS Code>              git clone https://github.com/Nico-Curti/easyDAG
-PS Code>              cd easyDAG
-PS Code\easyDAG>      .\build.ps1
 ```
 
 ### CMake C++ installation
@@ -239,7 +91,6 @@ if you are working on a Windows machine the right script to call is the [`build.
 ## Usage
 
 The following [algebra.cpp](https://github.com/Nico-Curti/easyDAG/blob/master/example/algebra.cpp) example shows the basic APIs of **easyDAG**
-
 
 <img align="right" src="img/algebra.png" width="30%">
 
@@ -411,6 +262,65 @@ If the DAG has been already evaluated its dependencies are not re-computed.
 
 In this way long computations but also common steps do not need to be evaluated several times!
 
+## A more advance example
+
+Starting from the [`scorer`](https://github.com/Nico-Curti/scorer) project we can rewrite the computation of the Matthews Correlation Coefficient using a DAG scheme.
+
+You can find the full list of lambdas in the [mcc.cpp](https://github.com/Nico-Curti/easyDAG/blob/master/example/mcc.cpp) example.
+
+<img align="right" src="img/mcc.png" width="30%">
+
+```cpp
+auto yt = InputVariable(y_true);
+yt.set_name(y_true);
+
+auto yp = InputVariable(y_pred);
+yp.set_name(y_pred);
+
+auto n_labels = InputVariable(Nlabels);
+n_labels.set_name(Nlabels);
+
+auto n_class = InputVariable < int >();
+n_class.set_name(Nclass);
+
+// Compute the unique classes
+Step classes(get_classes, yt, yp, n_labels, n_labels);
+classes.set_name(classes);
+
+// set the Nclass as step for printing
+n_class.set(Nclass);
+
+// Compute the confusion matrix
+Step confusion_matrix(get_confusion_matrix, yt, yp, n_labels,
+                      classes, n_class);
+confusion_matrix.set_name(confusion_matrix);
+
+// Compute the True Positive
+Step TP(get_TP, confusion_matrix, n_class);
+TP.set_name(TP);
+// Compute the False Positive
+Step FP(get_FP, confusion_matrix, n_class);
+FP.set_name(FP);
+// Compute the False Negative
+Step FN(get_FN, confusion_matrix, n_class);
+FN.set_name(FN);
+
+// Compute the Test outcome positive
+Step TOP(get_TOP, TP, FP, n_class);
+TOP.set_name(TOP);
+// Compute the Condition positive or support
+Step P(get_P, TP, FN, n_class);
+P.set_name(P);
+
+// Compute the Matthews Correlation Coefficient
+Step MCC(get_overall_MCC, confusion_matrix, TOP, P, n_class);
+MCC.set_name(MCC);
+
+auto res = MCC();
+
+std :: cout << "Matthews Correlation Coefficient: " << res << std :: endl;
+```
+
 ### Useful API
 
 The [helper.h](https://github.com/Nico-Curti/easyDAG/blob/master/include/helper.h) and [utils.h](https://github.com/Nico-Curti/easyDAG/blob/master/include/utils.h) scripts include some useful APIs to manage `Step` variables.
@@ -487,7 +397,7 @@ See [here](https://github.com/Nico-Curti/easyDAG/blob/master/CONTRIBUTING.md) fo
 
 * <img src="https://avatars0.githubusercontent.com/u/24650975?s=400&v=4" width="25px"> **Nico Curti** [git](https://github.com/Nico-Curti), [unibo](https://www.unibo.it/sitoweb/nico.curti2)
 
-* <img src="https://avatars2.githubusercontent.com/u/1419337?s=400&v=4" width="25px;"/> **Enrico Giampieri** [git](https://github.com/EnricoGiampieri)
+* <img src="https://avatars2.githubusercontent.com/u/1419337?s=400&v=4" width="25px;"/> **Enrico Giampieri** [git](https://github.com/EnricoGiampieri), [unibo](https://www.unibo.it/sitoweb/enrico.giampieri)
 
 See also the list of [contributors](https://github.com/Nico-Curti/easyDAG/contributors) [![GitHub contributors](https://img.shields.io/github/contributors/Nico-Curti/easyDAG.svg?style=plastic)](https://github.com/Nico-Curti/easyDAG/graphs/contributors/) who participated in this project.
 

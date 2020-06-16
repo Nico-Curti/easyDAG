@@ -206,43 +206,23 @@ template < typename lambda, typename ... types > template < std :: size_t idx >
 constexpr void Step < lambda, types ... > :: dump_impl (std :: ostream & os) noexcept
 {
   if constexpr (idx + 1 < sizeof ... (types))
-  {
-    using idx_t = utils :: nth_type_of < idx + 1, types ... >;
-
-    os << std :: get < idx >(this->args).get_name() << std :: endl;
-    os << "  " << this->get_name() << " -> ";
-
     dump_impl < idx + 1 > (os);
 
-    if constexpr ( utils :: is_step < idx_t >() ) // it is a step
-    {
-      std :: get < idx >(this->args).dump(os);
-      os << std :: endl;
-    }
-  }
+  using idx_t = utils :: nth_type_of < idx, types ... >;
 
-  else
+  if constexpr ( utils :: is_step < idx_t >() ) // it is a step
   {
-    using idx_t = utils :: nth_type_of < idx, types ... >;
-
-    if constexpr ( utils :: is_step < idx_t >() ) // it is a step
-    {
-      os << std :: get < idx >(this->args).get_name() << std :: endl;
-
-      std :: get < idx >(this->args).dump(os);
-      os << std :: endl;
-    }
-    else if constexpr ( utils :: is_variable < idx_t >() ) // it is a variable
-      os << std :: get < idx >(this->args).get_name();
+    os << "  " << this->get_name() << " -> " << std :: get < idx >(this->args).get_name() << std :: endl;
+    std :: get < idx >(this->args).dump(os);
   }
-
+  else if constexpr ( utils :: is_variable < idx_t >() ) // it is a variable
+    os << "  " << this->get_name() << " -> " << std :: get < idx >(this->args).get_name() << std :: endl;
 }
 
 template < typename lambda, typename ... types >
 constexpr void Step < lambda, types ... > :: dump (std :: ostream & os) noexcept
 {
   os << "  " << this->get_name() << "[shape=box, style=filled,color=\".7 .3 1.0\"]" << std :: endl;
-  os << "  " << this->get_name() << " -> ";
   this->dump_impl < 0 >(os);
 }
 

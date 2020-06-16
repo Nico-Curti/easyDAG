@@ -92,7 +92,6 @@ message (STATUS "Looking for pthread library")
 set (CMAKE_THREAD_PREFER_PTHREAD ON)
 find_package (Threads REQUIRED)
 list (APPEND linked_libs Threads::Threads )
-#    add_definitions (-D_DEFAULT_SOURCE) # remove me in the future
 
 #################################################################
 #                         SETTING DIRECTORIES                   #
@@ -114,7 +113,6 @@ file(GLOB SRC           "${SRC_DIR}/*.cpp" )
 file(GLOB HEADER        "${INC_DIR}/*.h"   )
 file(GLOB HPP           "${INC_DIR}/*.hpp" )
 file(GLOB SCORER_HEADER "${INC_SCORER}/*.h")
-# file(GLOB EXE    "${EXAMPLE}/*.cpp")
 
 include_directories(${INC_DIR} ${HPP_DIR} ${TEST_DIR})
 
@@ -185,6 +183,10 @@ add_custom_target(example_condition)
 add_executable(condition ${EXAMPLE}/condition.cpp ${HEADER} ${HPP})
 target_link_libraries(condition ${linked_libs})# ${DAGlib})
 
+add_custom_target(example_mcc)
+add_executable(mcc ${EXAMPLE}/mcc.cpp ${HEADER} ${HPP})
+target_link_libraries(mcc ${linked_libs})# ${DAGlib})
+
 #################################################################
 #                          INSTALLERS                           #
 #################################################################
@@ -201,6 +203,7 @@ install(TARGETS algebra      DESTINATION ${OUT_DIR})
 install(TARGETS graph        DESTINATION ${OUT_DIR})
 install(TARGETS cached       DESTINATION ${OUT_DIR})
 install(TARGETS condition    DESTINATION ${OUT_DIR})
+install(TARGETS mcc          DESTINATION ${OUT_DIR})
 
 # #################################################################
 # #                          EXPORT DAG                          #

@@ -3,13 +3,13 @@
 
 #include <helper.h>
 
-template < std :: size_t idx, char symbol, class Tp, typename std :: enable_if < idx == 0 > :: type * = nullptr >
+template < std :: size_t idx, char symbol, class Tp, typename std :: enable_if < idx == 0 > :: type * >
 void print ( std :: ostream & os, Tp & t )
 {
   os << std :: get < 0 >(t) << ' ';
 }
 
-template < std :: size_t idx, char symbol, class Tp, typename std :: enable_if < idx != 0 > :: type * = nullptr >
+template < std :: size_t idx, char symbol, class Tp, typename std :: enable_if < idx != 0 > :: type * >
 void print ( std :: ostream & os, Tp & t )
 {
   os << std :: get < idx >(t) << ' ' << symbol << ' ';

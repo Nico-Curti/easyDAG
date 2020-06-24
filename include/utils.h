@@ -96,14 +96,14 @@ namespace utils
     template < class func, class type, class ... types >
     struct num_operations_impl < Step < func, type, types ... > >
     {
-      static constexpr int value = num_operations < type > :: value + num_operations < types ... > :: value;
+      static constexpr int value = :: utils :: num_operations < type > :: value + :: utils :: num_operations < types ... > :: value;
     };
 
     // it is a single step
     template < class func, class type >
     struct num_operations_impl < Step < func, type > >
     {
-      static constexpr int value = num_operations < type > :: value;
+      static constexpr int value = :: utils :: num_operations < type > :: value;
     };
 
   } // end namespace
@@ -193,8 +193,8 @@ namespace utils
   template < typename lambda, typename ... types >
   struct OperationCount < Step < lambda, types ... > >
   {
-    static constexpr int num_operations = num_operations < Step < lambda, types ... > > :: value;
-    static constexpr int num_variables = num_variables < Step < lambda, types ... > > :: value;
+    static constexpr int num_operations = :: utils :: num_operations < Step < lambda, types ... > > :: value;
+    static constexpr int num_variables = :: utils :: num_variables < Step < lambda, types ... > > :: value;
     static constexpr int num_nodes = num_operations + num_variables;
     // static constexpr int num_cached = 0;
   };
@@ -208,7 +208,7 @@ namespace detail
 {
 
 template < class F, class Tuple, std :: size_t ... I >
-constexpr decltype(auto) apply_impl ( F && f, Tuple && t, std :: index_sequence < I ... > )
+inline constexpr decltype(auto) apply_impl ( F && f, Tuple && t, std :: index_sequence < I ... > )
 {
   // This implementation is valid since C++20 (via P1065R2)
   // In C++17, a constexpr counterpart of std::invoke is actually needed here
@@ -223,7 +223,7 @@ namespace std
 {
 
 template < class F, class Tuple >
-constexpr decltype(auto) apply ( F && f, Tuple && t )
+inline constexpr decltype(auto) apply ( F && f, Tuple && t )
 {
   return detail :: apply_impl( std :: forward < F >(f), std :: forward < Tuple >(t),
       std :: make_index_sequence < std :: tuple_size < std :: remove_reference_t < Tuple > > :: value > {});

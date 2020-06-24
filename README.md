@@ -105,16 +105,15 @@ int main ()
 
   float y1 = 2.f;
   float y2 = 4.f;
-                               //                     ___ a
+                               //                    ____ a
   InputVariable a(x1);         //                   |
-  InputVariable b(x2);         //          __ mul_1 *
+  InputVariable b(x2);         //         ___ mul_1 *
   InputVariable c(y1);         //        |          |____ b
   InputVariable d(y2);         //        |
-                               // sum __ +
-  auto mul_1 = a * d;          //        |           ____ c
-  auto mul_2 = b * c;          //        |          |
-  auto sum = mul_1 + mul_2;    //        ____ mul_2 *
-                               //                   |____ d
+                               // sum __ +           ____ c
+  auto mul_1 = a * d;          //        |          |
+  auto mul_2 = b * c;          //        |___ mul_2 *
+  auto sum = mul_1 + mul_2;    //                   |____ d
 
   std :: cout << "(a * d) + (b * c) = " << sum() << std :: endl;
   // (a * d) + (b * c) = 8.f
@@ -335,14 +334,14 @@ auto b = InputVariable < decltype(y) > ();
 
 auto sum1 = a + b;
 
-static_assert ( utils :: is_variable < decltype(x)    >() == true,  "It is a variable");
-static_assert ( utils :: is_variable < decltype(a)    >() == true,  "It is a variable");
-static_assert ( utils :: is_variable < decltype(b)    >() == true,  "It is a variable");
-static_assert ( utils :: is_variable < decltype(sum1) >() == false, "It is not a variable");
-static_assert ( utils :: is_step     < decltype(x)    >() == false, "It is not a step");
-static_assert ( utils :: is_step     < decltype(a)    >() == false, "It is not a step");
-static_assert ( utils :: is_step     < decltype(b)    >() == false, "It is not a step");
-static_assert ( utils :: is_step     < decltype(sum1) >() == true,  "It is a step");
+static_assert ( utils :: is_variable < decltype(x)    > :: value == true,  "It is a variable");
+static_assert ( utils :: is_variable < decltype(a)    > :: value == true,  "It is a variable");
+static_assert ( utils :: is_variable < decltype(b)    > :: value == true,  "It is a variable");
+static_assert ( utils :: is_variable < decltype(sum1) > :: value == false, "It is not a variable");
+static_assert ( utils :: is_step     < decltype(x)    > :: value == false, "It is not a step");
+static_assert ( utils :: is_step     < decltype(a)    > :: value == false, "It is not a step");
+static_assert ( utils :: is_step     < decltype(b)    > :: value == false, "It is not a step");
+static_assert ( utils :: is_step     < decltype(sum1) > :: value == true,  "It is a step");
 ```
 
 In this way you can check at **compile time** the variable types.

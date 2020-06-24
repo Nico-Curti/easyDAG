@@ -7,7 +7,7 @@ namespace math
 struct
 {
   template < typename type >
-  auto operator () (type first)
+  type operator () (type first)
   {
     return first;
   }
@@ -21,10 +21,16 @@ struct
 
 struct
 {
-  template < typename ... types >
-  auto operator () (types ... args)
+  template < typename type >
+  type operator () (type first)
   {
-    return (args + ...);
+    return first;
+  }
+
+  template < typename type, typename ... types >
+  auto operator () (type arg, types ... args)
+  {
+    return arg + operator()(args ...);
   }
 
   static constexpr char symbol ()
@@ -36,10 +42,16 @@ struct
 
 struct
 {
-  template < typename ... types >
-  auto operator () (types ... args)
+  template < typename type >
+  type operator () (type first)
   {
-    return (args - ...);
+    return first;
+  }
+
+  template < typename type, typename ... types >
+  auto operator () (type arg, types ... args)
+  {
+    return arg - operator()(args ...);
   }
 
   static constexpr char symbol ()
@@ -51,10 +63,16 @@ struct
 
 struct
 {
-  template < typename ... types >
-  auto operator () (types ... args)
+  template < typename type >
+  type operator () (type first)
   {
-    return (args * ...);
+    return first;
+  }
+
+  template < typename type, typename ... types >
+  auto operator () (type arg, types ... args)
+  {
+    return arg * operator()(args ...);
   }
 
   static constexpr char symbol ()
@@ -66,10 +84,16 @@ struct
 
 struct
 {
-  template < typename ... types >
-  auto operator () (types ... args)
+  template < typename type >
+  type operator () (type first)
   {
-    return (args / ...);
+    return first;
+  }
+
+  template < typename type, typename ... types >
+  auto operator () (type arg, types ... args)
+  {
+    return arg / operator()(args ...);
   }
 
   static constexpr char symbol ()
@@ -81,20 +105,32 @@ struct
 
 struct
 {
-  template < typename ... types >
-  auto operator () (types ... args)
+  template < typename type >
+  auto operator () (type args)
   {
-    return (args == ...);
+    return args;
+  }
+
+  template < typename type, typename ... types >
+  auto operator () (type arg, types ... args)
+  {
+    return arg == operator()(args ...);
   }
 
 } Eq_lambda;
 
 struct
 {
-  template < typename ... types >
-  auto operator () (types ... args)
+  template < typename type >
+  type operator () (type first)
   {
-    return (args != ...);
+    return first;
+  }
+
+  template < typename type, typename ... types >
+  auto operator () (type arg, types ... args)
+  {
+    return arg != operator()(args ...);
   }
 
 } NEq_lambda;

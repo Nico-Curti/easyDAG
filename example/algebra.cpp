@@ -27,16 +27,16 @@ int main ()
   float y1 = 3.f;
   float y2 = 4.f;
 
-  auto a = InputVariable(x1);                     //                        ___ a
+  auto a = InputVariable(x1);                     //                       ____ a
   auto b = InputVariable(x2);                     //                      |
-  auto c = InputVariable(y1);                     //             __ add_1 +
+  auto c = InputVariable(y1);                     //            ___ add_1 +
   auto d = InputVariable(y2);                     //           |          |____ b
                                                   //           |
-  Step add_1(math :: Add_lambda, a, b);           // result __ x
-  Step add_2(math :: Add_lambda, c, d);           //           |           ____ c
-  Step mul_1(math :: Mul_lambda, add_1, add_2);   //           |          |
-                                                  //           ____ add_2 +
-  std :: cout << mul_1 << std :: endl;            //                      |____ d
+  Step add_1(math :: Add_lambda, a, b);           // result __ x           ____ c
+  Step add_2(math :: Add_lambda, c, d);           //           |          |
+  Step mul_1(math :: Mul_lambda, add_1, add_2);   //           |___ add_2 +
+                                                  //                      |____ d
+  std :: cout << mul_1 << std :: endl;            //
 
   auto result = mul_1 ();
   assert ( result == 21.f );

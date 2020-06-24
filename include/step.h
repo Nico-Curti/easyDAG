@@ -7,9 +7,14 @@
 #include <utility>
 #include <iostream>
 #include <functional>
+#include <type_traits>
+
+// forward declaration
+template < typename lambda, typename ... types >
+class Step;
 
 #include <math.hpp>
-
+#include <utils.h>
 
 template < typename lambda, typename ... types >
 class Step
@@ -31,7 +36,6 @@ class Step
 
   template < std :: size_t idx = 0 >
   constexpr void dump_impl (std :: ostream & os) noexcept;
-
 
 public:
 
@@ -55,16 +59,7 @@ public:
 
   // getter function
 
-  template < std :: size_t idx >
-  static constexpr auto num_variables_impl () noexcept;
-
-  template < std :: size_t idx >
-  static constexpr auto num_operations_impl () noexcept;
-
   constexpr auto arguments () noexcept;
-  static constexpr auto num_variables () noexcept;
-  static constexpr auto num_operations () noexcept;
-  static constexpr auto size () noexcept;
 
   std :: string get_name ();
 

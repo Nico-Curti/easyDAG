@@ -3,16 +3,17 @@
 
 #include <helper.h>
 
-template < std :: size_t I, char symbol, typename ... Tp >
-void print ( std :: ostream & os, std :: tuple < Tp ... > & t )
+template < std :: size_t idx, char symbol, class Tp, typename std :: enable_if < idx == 0 > :: type * = nullptr >
+void print ( std :: ostream & os, Tp & t )
 {
-  if constexpr (I > 0)
-  {
-    os << std :: get < I >(t) << " " << symbol << " ";
-    print < I - 1, symbol, Tp ... >(os, t);
-  }
-  else
-    os << std :: get < I >(t) << " ";
+  os << std :: get < 0 >(t) << ' ';
+}
+
+template < std :: size_t idx, char symbol, class Tp, typename std :: enable_if < idx != 0 > :: type * = nullptr >
+void print ( std :: ostream & os, Tp & t )
+{
+  os << std :: get < idx >(t) << ' ' << symbol << ' ';
+  print < idx - 1, symbol > (os, t);
 }
 
 template < class T >

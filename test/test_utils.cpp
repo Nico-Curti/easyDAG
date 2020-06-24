@@ -14,14 +14,14 @@ TEST_CASE ( "Test is_type", "[is_type]" )
 
   auto sum1 = a + b;
 
-  REQUIRE ( utils :: is_variable < decltype(x)    >() == true);
-  REQUIRE ( utils :: is_variable < decltype(a)    >() == true);
-  REQUIRE ( utils :: is_variable < decltype(b)    >() == true);
-  REQUIRE ( utils :: is_variable < decltype(sum1) >() == false);
-  REQUIRE ( utils :: is_step     < decltype(x)    >() == false);
-  REQUIRE ( utils :: is_step     < decltype(a)    >() == false);
-  REQUIRE ( utils :: is_step     < decltype(b)    >() == false);
-  REQUIRE ( utils :: is_step     < decltype(sum1) >() == true);
+  REQUIRE ( utils :: is_variable_v < decltype(x)    > == true);
+  REQUIRE ( utils :: is_variable_v < decltype(a)    > == true);
+  REQUIRE ( utils :: is_variable_v < decltype(b)    > == true);
+  REQUIRE ( utils :: is_variable_v < decltype(sum1) > == false);
+  REQUIRE ( utils :: is_step_v     < decltype(x)    > == false);
+  REQUIRE ( utils :: is_step_v     < decltype(a)    > == false);
+  REQUIRE ( utils :: is_step_v     < decltype(b)    > == false);
+  REQUIRE ( utils :: is_step_v     < decltype(sum1) > == true);
 
 }
 

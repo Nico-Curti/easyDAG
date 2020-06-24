@@ -5,7 +5,7 @@
 
 #include <alias.hpp>
 #include <helper.hpp>
-#include <utils.hpp>
+#include <utils.h>
 
 
 template < typename lambda, typename ... types >
@@ -17,55 +17,6 @@ Step < lambda, types ... > :: Step (lambda & func, types & ... args) : func (std
 {
 }
 
-template < typename lambda, typename ... types > template < std :: size_t idx >
-constexpr auto Step < lambda, types ... > :: num_variables_impl () noexcept
-{
-  if constexpr (idx < sizeof ... (types))
-  {
-    using idx_t = utils :: nth_type_of < idx, types ... >;
-    if constexpr (details :: is_instance < idx_t, Step > :: value)
-      return idx_t :: num_variables() + num_variables_impl < idx + 1 >();
-
-    return num_operations_impl < idx + 1 >() + 1;
-  }
-  else
-    return 0;
-}
-
-template < typename lambda, typename ... types >
-constexpr auto Step < lambda, types ... > :: num_variables () noexcept
-{
-  return num_variables_impl < 0 > ();
-}
-
-template < typename lambda, typename ... types > template < std :: size_t idx >
-constexpr auto Step < lambda, types ... > :: num_operations_impl () noexcept
-{
-  if constexpr (idx < sizeof ... (types))
-  {
-    using idx_t = utils :: nth_type_of < idx, types ... >;
-    if constexpr (utils :: is_step < idx_t >())
-      return idx_t :: num_operations() + num_operations_impl < idx + 1 >();
-
-    return num_operations_impl < idx + 1 >();
-  }
-  else
-    return 0;
-
-}
-
-template < typename lambda, typename ... types >
-constexpr auto Step < lambda, types ... > :: num_operations () noexcept
-{
-  return num_operations_impl < 0 > () + 1;
-}
-
-template < typename lambda, typename ... types >
-constexpr auto Step < lambda, types ... > :: size () noexcept
-{
-  return num_variables() + num_operations();
-}
-
 template < typename lambda, typename ... types >
 std :: string Step < lambda, types ... > :: get_name ()
 {
@@ -75,8 +26,10 @@ std :: string Step < lambda, types ... > :: get_name ()
 template < typename lambda, typename ... types > template < class type >
 constexpr auto Step < lambda, types ... > :: eval_impl (type & arg) noexcept
 {
-  if constexpr ( details :: is_instance < std :: remove_reference_t < type > , Step > :: value )
+  // it is a step
+  if constexpr ( utils :: is_instance < std :: remove_reference_t < type > , Step > :: value )
     return arg();
+  // it is a variable
   else
     return arg;
 }
@@ -193,7 +146,7 @@ std :: ostream & operator << (std :: ostream & os, Step < lambda, types ... > x)
   auto kwargs = x.arguments();
   os << x.get_name() << " ( ";
 
-  if constexpr ( details :: has_symbol < lambda > :: value )
+  if constexpr ( utils :: has_symbol < lambda > :: value )
     print < std :: tuple_size < decltype(kwargs) > :: value - 1, lambda :: symbol() > (os, kwargs);
   else
     print < std :: tuple_size < decltype(kwargs) > :: value - 1, ' ' > (os, kwargs);
@@ -210,12 +163,12 @@ constexpr void Step < lambda, types ... > :: dump_impl (std :: ostream & os) noe
 
   using idx_t = utils :: nth_type_of < idx, types ... >;
 
-  if constexpr ( utils :: is_step < idx_t >() ) // it is a step
+  if constexpr ( utils :: is_step < idx_t > :: value ) // it is a step
   {
     os << "  " << this->get_name() << " -> " << std :: get < idx >(this->args).get_name() << std :: endl;
     std :: get < idx >(this->args).dump(os);
   }
-  else if constexpr ( utils :: is_variable < idx_t >() ) // it is a variable
+  else if constexpr ( utils :: is_variable < idx_t > :: value ) // it is a variable
     os << "  " << this->get_name() << " -> " << std :: get < idx >(this->args).get_name() << std :: endl;
 }
 

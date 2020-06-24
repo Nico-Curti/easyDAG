@@ -123,17 +123,17 @@ TEST_CASE ( "Test add & mul step num_variables", "[add_mul_num_variables]" )
   Step add_2(math :: Add_lambda, c, d);
   Step mul_1(math :: Mul_lambda, add_1, add_2);
 
-  REQUIRE ( add_1.num_variables() == 2 );
-  REQUIRE ( add_2.num_variables() == 2 );
-  REQUIRE ( mul_1.num_variables() == 4 );
+  REQUIRE ( utils :: num_variables < decltype(add_1) > :: value == 2 );
+  REQUIRE ( utils :: num_variables < decltype(add_2) > :: value == 2 );
+  REQUIRE ( utils :: num_variables < decltype(mul_1) > :: value == 4 );
 
-  REQUIRE ( add_1.num_operations() == 1 );
-  REQUIRE ( add_2.num_operations() == 1 );
-  REQUIRE ( mul_1.num_operations() == 3 );
+  REQUIRE ( utils :: num_operations < decltype(add_1) > :: value == 1 );
+  REQUIRE ( utils :: num_operations < decltype(add_2) > :: value == 1 );
+  REQUIRE ( utils :: num_operations < decltype(mul_1) > :: value == 3 );
 
-  REQUIRE ( add_1.size() == 3 );
-  REQUIRE ( add_2.size() == 3 );
-  REQUIRE ( mul_1.size() == 7 );
+  REQUIRE ( utils :: dag_size < decltype(add_1) > :: value == 3 );
+  REQUIRE ( utils :: dag_size < decltype(add_2) > :: value == 3 );
+  REQUIRE ( utils :: dag_size < decltype(mul_1) > :: value == 7 );
 }
 
 

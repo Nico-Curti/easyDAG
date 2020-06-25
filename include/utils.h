@@ -7,13 +7,21 @@ namespace utils
   template < int N, typename ... types >
   using nth_type_of = typename std :: tuple_element < N, std :: tuple < types ... > > :: type;
 
-  // struct to check the variable type (isinstance python-like)
-  template < class, template < class ... > class, class ... >
-  struct is_instance : public std :: false_type {};
+  namespace details
+  {
+    // struct to check the variable type (isinstance python-like)
+    template < class, template < class, class ... > class >
+    struct is_instance_impl : public std :: false_type {};
 
-  // it is a struct with signature given by U < T, V ... > (like a step)
-  template < class T, template < class ... > class U, class ... V >
-  struct is_instance < U < T, V ... >, U > : public std :: true_type {};
+    // it is a struct with signature given by U < T, V ... > (like a step)
+    template < template < class, class ... > class U, class ... Ts >
+    struct is_instance_impl < U < Ts ... >, U > : public std :: true_type {};
+  }
+
+  // useful alias
+  template < class T, template < class, class ... > class U >
+  using is_instance = details :: is_instance_impl < std :: decay_t < T >, U >;
+
 
   template < class T >
   struct has_symbol
@@ -202,7 +210,7 @@ namespace utils
 }
 
 
-#if __cplusplus < 201700
+#if __cplusplus < 201700 && !_MSC_VER
 
 namespace detail
 {
@@ -231,6 +239,6 @@ inline constexpr decltype(auto) apply ( F && f, Tuple && t )
 
 }
 
-#endif
+#endif // old __cplusplus
 
 #endif // __utils_h__

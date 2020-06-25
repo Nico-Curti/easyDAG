@@ -97,7 +97,7 @@ private:
 
   // other Private members
 
-#ifndef __clang__
+#if !(defined __clang__) && !(defined _MSC_VER)
 
   using eval_t = typename std :: result_of < decltype(& Step < lambda, types ... > :: evaluate)( Step < lambda, types ... > ) > :: type;
 
@@ -110,6 +110,10 @@ private:
 
 };
 
+
+// This is the CTAD workaround for std <= 14
+template < typename lambda, typename ... types >
+constexpr Step < lambda, types ... > make_step (lambda & func, types & ... args) noexcept;
 
 template < typename type >
 constexpr Step < decltype(math :: Input), type > InputVariable (type & var) noexcept;

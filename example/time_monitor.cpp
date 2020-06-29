@@ -37,10 +37,9 @@ public:
 
   // Constructor
 
-  Monitor (lambda & func, types & ... args) : Task < lambda, types ... >(func, args ...)
+  Monitor (lambda & func, types & ... args) : Task < lambda, types ... >(func, args ...),
+                                              tic ( std :: chrono :: system_clock :: now () ), toc ( std :: chrono :: system_clock :: now () )
   {
-    tic = std :: chrono :: system_clock :: now ();
-    toc = std :: chrono :: system_clock :: now ();
   }
 
   constexpr decltype(auto) operator () () noexcept

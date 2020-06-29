@@ -4,7 +4,7 @@
 namespace utils
 {
 
-  template < int N, typename ... types >
+  template < int N, class ... types >
   using nth_type_of = typename std :: tuple_element < N, std :: tuple < types ... > > :: type;
 
   namespace details
@@ -22,6 +22,28 @@ namespace utils
   template < class T, template < class, class ... > class U >
   using is_instance = details :: is_instance_impl < std :: decay_t < T >, U >;
 
+  namespace details
+  {
+    template < template < class, class ... > class base, class derived >
+    struct is_base_of_step_impl
+    {
+      template < class T, class ... Ts >
+      static constexpr std :: true_type  test (const base < T, Ts ... > * );
+
+      static constexpr std :: false_type test (...);
+
+      using type = decltype( test (std :: declval < derived * >() ) );
+    };
+  }
+
+  template < template < class, class ... > class base, class derived >
+  using is_base_of_step = typename details :: is_base_of_step_impl < base, derived > :: type;
+
+  template < class T, template < class, class ... > class U >
+  struct is_step_instance
+  {
+    static constexpr bool value = is_instance < T, Step > :: value || is_base_of_step < Step, T > :: value;
+  };
 
   template < class T >
   struct has_symbol
@@ -30,10 +52,10 @@ namespace utils
     struct check;
 
     template < class U >
-    static std :: true_type test ( check < char (*) ( ), & U :: symbol > * );
+    static constexpr std :: true_type test ( check < char (*) ( ), & U :: symbol > * );
 
     template < class U >
-    static std :: false_type test ( ... );
+    static constexpr std :: false_type test ( ... );
 
     static const bool value = decltype( test < T > (0) ) :: value;
   };
@@ -52,7 +74,7 @@ namespace utils
 
   // it is a step variable
   template < class T >
-  struct is_variable < T, booltype < is_instance < T, Step > :: value > >
+  struct is_variable < T, booltype < is_step_instance < T, Step > :: value > >
   {
     // a variable is a step with a lambda function equal to math :: Input
     static constexpr bool value = std :: is_same < typename T :: lambda_func, decltype(math :: Input) > :: value;
@@ -73,7 +95,7 @@ namespace utils
 
   // it is a step instance
   template < class T >
-  struct is_step < T, booltype < is_instance < T, Step > :: value > >
+  struct is_step < T, booltype < is_step_instance < T, Step > :: value > >
   {
     // a variable is a step with a lambda function different from math :: Input
     static constexpr bool value = !std :: is_same < typename T :: lambda_func, decltype(math :: Input) > :: value;
@@ -82,6 +104,23 @@ namespace utils
   // useful alias
   template < class T >
   constexpr bool is_step_v = is_step < T > :: value;
+
+
+  // Get the equivalent step type
+  template < class T, typename std :: enable_if < is_step < T > :: value > :: type * = nullptr >
+  struct get_step_type
+  {
+    template < class C >
+    struct get_template_type;
+
+    template < template < class, class ... > class C, class Func, class ... types >
+    struct get_template_type < C < Func, types ... > >
+    {
+      using type = Step < Func, types ... >;
+    };
+
+    using type = typename get_template_type < T > :: type;
+  };
 
 
   // Number of operations in the DAG
@@ -128,7 +167,7 @@ namespace utils
   struct num_operations < T, booltype < is_step < T > :: value >, types ... >
   {
     // +1 is the current step
-    static constexpr int value = 1 + detail :: num_operations_impl < T > :: value;
+    static constexpr int value = 1 + detail :: num_operations_impl < typename get_step_type < T > :: type > :: value;
   };
 
   // Number of variables in DAG
@@ -174,7 +213,7 @@ namespace utils
   template < class T, class ... types >
   struct num_variables < T, booltype < is_step < T > :: value >, types ... >
   {
-    static constexpr int value = detail :: num_variables_impl < T > :: value;
+    static constexpr int value = detail :: num_variables_impl < typename get_step_type < T > :: type > :: value;
   };
 
   // sizeo of the DAG
@@ -187,7 +226,7 @@ namespace utils
   };
 
   template < class T >
-  struct dag_size < T, booltype < is_instance < T, Step > :: value > >
+  struct dag_size < T, booltype < is_step_instance < T, Step > :: value > >
   {
     // the size is given by the SUM of the number of variables and the number of operations
     static constexpr int value = num_operations < T > :: value + num_variables < T > :: value;
@@ -195,14 +234,11 @@ namespace utils
 
   // Operation counter
 
-  template < typename lambda, typename ... types >
-  struct OperationCount {};
-
-  template < typename lambda, typename ... types >
-  struct OperationCount < Step < lambda, types ... > >
+  template < class T, typename std :: enable_if < utils :: is_step < T > :: value > :: type * = nullptr >
+  struct OperationCount
   {
-    static constexpr int num_operations = :: utils :: num_operations < Step < lambda, types ... > > :: value;
-    static constexpr int num_variables = :: utils :: num_variables < Step < lambda, types ... > > :: value;
+    static constexpr int num_operations = :: utils :: num_operations < T > :: value;
+    static constexpr int num_variables = :: utils :: num_variables < T > :: value;
     static constexpr int num_nodes = num_operations + num_variables;
     // static constexpr int num_cached = 0;
   };

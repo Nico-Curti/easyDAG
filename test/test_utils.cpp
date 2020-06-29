@@ -2,7 +2,7 @@
 #include <catch.hpp>
 #include <sstream>
 
-#include <step.hpp>
+#include <task.hpp>
 
 
 TEST_CASE ( "Test is_type", "[is_type]" )
@@ -65,13 +65,13 @@ TEST_CASE ( "Test operation_name", "[name_op]" )
   c.set_name(c);
   d.set_name(d);
 
-  Step add_1(math :: Add_lambda, a, b);
+  Task add_1(math :: Add_lambda, a, b);
   add_1.set_name(add_1);
 
-  Step add_2(math :: Add_lambda, c, d, a);
+  Task add_2(math :: Add_lambda, c, d, a);
   add_2.set_name(add_2);
 
-  Step mul_1(math :: Mul_lambda, add_1, add_2);
+  Task mul_1(math :: Mul_lambda, add_1, add_2);
   mul_1.set_name(mul_1);
 
   REQUIRE ( mul_1.get_name() == "mul_1" );
@@ -98,13 +98,13 @@ TEST_CASE ( "Test operation_cout", "[cout_op]" )
   c.set_name(c);
   d.set_name(d);
 
-  Step add_1(math :: Add_lambda, a, b);
+  Task add_1(math :: Add_lambda, a, b);
   add_1.set_name(add_1);
 
-  Step add_2(math :: Add_lambda, c, d, a);
+  Task add_2(math :: Add_lambda, c, d, a);
   add_2.set_name(add_2);
 
-  Step mul_1(math :: Mul_lambda, add_1, add_2);
+  Task mul_1(math :: Mul_lambda, add_1, add_2);
   mul_1.set_name(mul_1);
 
   std :: stringstream os;
@@ -134,13 +134,13 @@ TEST_CASE ( "Test operation_cout_no_symbol", "[cout_op_no_symbol]" )
   auto add_lambda = [](auto x1, auto x2){return x1 + x2;};
   auto mul_lambda = [](auto x1, auto x2){return x1 * x2;};
 
-  Step add_1(add_lambda, a, b);
+  Task add_1(add_lambda, a, b);
   add_1.set_name(add_1);
 
-  Step add_2(add_lambda, c, d);
+  Task add_2(add_lambda, c, d);
   add_2.set_name(add_2);
 
-  Step mul_1(mul_lambda, add_1, add_2);
+  Task mul_1(mul_lambda, add_1, add_2);
   mul_1.set_name(mul_1);
 
   std :: stringstream os;
@@ -149,7 +149,7 @@ TEST_CASE ( "Test operation_cout_no_symbol", "[cout_op_no_symbol]" )
   REQUIRE ( os.str() == "mul_1 ( add_2 ( d ( 4 )   c ( 3 ) )   add_1 ( b ( 2 )   a ( 1 ) ) )" );
 }
 
-TEST_CASE ( "Test operation_graph", "[graph_op]" )
+TEST_CASE ( "Test operation_graphviz", "[graphviz_op]" )
 {
   float x1 = 1.f;
   float x2 = 2.f;
@@ -167,17 +167,17 @@ TEST_CASE ( "Test operation_graph", "[graph_op]" )
   c.set_name(c);
   d.set_name(d);
 
-  Step add_1(math :: Add_lambda, a, b);
+  Task add_1(math :: Add_lambda, a, b);
   add_1.set_name(add_1);
 
-  Step add_2(math :: Add_lambda, c, d, a);
+  Task add_2(math :: Add_lambda, c, d, a);
   add_2.set_name(add_2);
 
-  Step mul_1(math :: Mul_lambda, add_1, add_2);
+  Task mul_1(math :: Mul_lambda, add_1, add_2);
   mul_1.set_name(mul_1);
 
   std :: stringstream os;
-  mul_1.graph(os, "pipeline");
+  mul_1.graphviz(os, "pipeline");
 
   std :: string true_pipe = "digraph pipeline {\n\
   mul_1[shape=box, style=filled,color=\".7 .3 1.0\"]\n\

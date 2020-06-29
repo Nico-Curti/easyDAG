@@ -1,5 +1,5 @@
 /***************** CONDITION EXAMPLE ***************/
-// Last update: 16/06/2020
+// Last update: 29/06/2020
 //
 // In this example we use a condition to update the
 // DAG variables.
@@ -13,7 +13,7 @@
 //
 /***************************************************/
 
-#include <step.hpp>
+#include <task.hpp>
 
 #include <cassert>
 #include <iostream>
@@ -55,13 +55,13 @@ int main ()
                     std :: cout << "Counter equal to " << counter << std :: endl;
                 };
 
-  Step increment_step(increment, counter);
-  Step check_step(condition, counter);
+  Task increment_step(increment, counter);
+  Task check_step(condition, counter);
 
   while ( ! check_step () )
   {
     // you cannot use set if there are other steps! (a step is not copyable)
-    Step result_step(result, check_step, counter);
+    Task result_step(result, check_step, counter);
 
     // evaluate the step
     result_step();

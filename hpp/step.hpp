@@ -9,11 +9,7 @@
 
 
 template < typename lambda, typename ... types >
-Step < lambda, types ... > :: Step (lambda & func, types & ... args) : func (std :: forward < lambda >(func)), args (std :: tie(args ...)),
-#if !(defined __clang__) && !(defined _MSC_VER)
-                                                                       value ( std :: async ( std :: launch :: async, & Step < lambda, types ... > :: evaluate, this ) ),
-#endif
-                                                                       _name ("Step")
+Step < lambda, types ... > :: Step (lambda & func, types & ... args) : func (std :: forward < lambda >(func)), args (std :: tie(args ...)), _name ("Task")
 {
 }
 
@@ -26,8 +22,10 @@ std :: string Step < lambda, types ... > :: get_name ()
 template < typename lambda, typename ... types > template < class type >
 constexpr auto Step < lambda, types ... > :: eval_impl (type & arg) noexcept
 {
-  // it is a step
-  if constexpr ( utils :: is_instance < std :: remove_reference_t < type > , :: Step > :: value )
+  using current_type = std :: remove_reference_t < type >;
+
+  // it is a step or it is a derived class of step
+  if constexpr ( utils :: is_step_instance < current_type, :: Step > :: value )
     return arg();
   // it is a variable
   else
@@ -43,28 +41,13 @@ constexpr auto Step < lambda, types ... > :: packing (types  & ... arg) noexcept
 template < typename lambda, typename ... types >
 constexpr decltype(auto) Step < lambda, types ... > :: eval () noexcept
 {
-  return std :: apply(packing, this->args);
-}
-
-template < typename lambda, typename ... types >
-constexpr decltype(auto) Step < lambda, types ... > :: evaluate () noexcept
-{
-  return std :: apply(this->func, this->eval());
+  return std :: apply(this->func, std :: apply(packing, this->args));
 }
 
 template < typename lambda, typename ... types >
 constexpr decltype(auto) Step < lambda, types ... > :: operator () () noexcept
 {
-
-#if !(defined __clang__) && !(defined _MSC_VER)
-
-  return this->value.get();
-
-#else
-
-  return this->evaluate();
-
-#endif
+  return this->eval();
 }
 
 template < typename lambda, typename ... types >
@@ -77,12 +60,6 @@ template < typename lambda, typename ... types >
 constexpr void Step < lambda, types ... > :: set (types & ... args) noexcept
 {
   this->args = std :: tuple < types ... >(args ... );
-
-#if !(defined __clang__) && !(defined _MSC_VER)
-
-  this->value = std :: async ( std :: launch :: async, & Step < lambda, types ... > :: evaluate, this );
-
-#endif
 }
 
 template < typename lambda, typename ... types >
@@ -180,7 +157,7 @@ constexpr void Step < lambda, types ... > :: dump (std :: ostream & os) noexcept
 }
 
 template < typename lambda, typename ... types >
-constexpr void Step < lambda, types ... > :: graph (std :: ostream & os, const std :: string & graph_name) noexcept
+constexpr void Step < lambda, types ... > :: graphviz (std :: ostream & os, const std :: string & graph_name) noexcept
 {
   os << "digraph " << graph_name << " {" << std :: endl;
 

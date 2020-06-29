@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
-#include <step.hpp>
+#include <task.hpp>
 
 
 TEST_CASE ( "Test get variable", "[get]" )
@@ -38,7 +38,7 @@ TEST_CASE ( "Test simple step", "[step]" )
 
   float x = 3.14f;
 
-  Step Double(lambda, x);
+  Task Double(lambda, x);
 
   REQUIRE ( Double() == x * 2.f );
 }
@@ -52,7 +52,7 @@ TEST_CASE ( "Test add step", "[add]" )
   auto a = InputVariable(x);
   auto b = InputVariable(y);
 
-  Step add(math :: Add_lambda, a, b);
+  Task add(math :: Add_lambda, a, b);
 
   REQUIRE ( add() == 45.14f );
 }
@@ -68,7 +68,7 @@ TEST_CASE ( "Test add step set", "[add_set]" )
   a.set(x);
   b.set(y);
 
-  Step add(math :: Add_lambda, a, b);
+  Task add(math :: Add_lambda, a, b);
 
   REQUIRE ( a()   == x );
   REQUIRE ( b()   == y );
@@ -98,9 +98,9 @@ TEST_CASE ( "Test add & mul step", "[add_mul]" )
   auto c = InputVariable(y1);
   auto d = InputVariable(y2);
 
-  Step add_1(math :: Add_lambda, a, b);
-  Step add_2(math :: Add_lambda, c, d);
-  Step mul_1(math :: Mul_lambda, add_1, add_2);
+  Task add_1(math :: Add_lambda, a, b);
+  Task add_2(math :: Add_lambda, c, d);
+  Task mul_1(math :: Mul_lambda, add_1, add_2);
 
   REQUIRE ( mul_1() == 21.f );
 }
@@ -119,9 +119,9 @@ TEST_CASE ( "Test add & mul step num_variables", "[add_mul_num_variables]" )
   auto c = InputVariable(y1);
   auto d = InputVariable(y2);
 
-  Step add_1(math :: Add_lambda, a, b);
-  Step add_2(math :: Add_lambda, c, d);
-  Step mul_1(math :: Mul_lambda, add_1, add_2);
+  Task add_1(math :: Add_lambda, a, b);
+  Task add_2(math :: Add_lambda, c, d);
+  Task mul_1(math :: Mul_lambda, add_1, add_2);
 
   REQUIRE ( utils :: num_variables < decltype(add_1) > :: value == 2 );
   REQUIRE ( utils :: num_variables < decltype(add_2) > :: value == 2 );

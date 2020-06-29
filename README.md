@@ -133,7 +133,7 @@ A full list of default lambda math-functions is provided in the [math.hpp](https
 
 ### View Graph
 
-In the [graph.cpp](https://github.com/Nico-Curti/easyDAG/blob/master/example/graph.cpp) example we show how you can use easyDAG to visualize your DAG scheme using DOT.
+In the [graphviz.cpp](https://github.com/Nico-Curti/easyDAG/blob/master/example/graphviz.cpp) example we show how you can use easyDAG to visualize your DAG scheme using DOT.
 
 <img align="right" src="img/reduction.png" width="30%">
 
@@ -169,28 +169,28 @@ auto reduce = [](std :: vector < float > res)
 auto size = InputVariable(N);
 size.set_name(size);
 
-Step init_x(init, size);
-Step init_y(init, size);
+Task init_x(init, size);
+Task init_y(init, size);
 
 init_x.set_name(init_x);
 init_y.set_name(init_y);
 
-Step fill_x(fill, init_x);
-Step fill_y(fill, init_y);
+Task fill_x(fill, init_x);
+Task fill_y(fill, init_y);
 
 fill_x.set_name(fill_x);
 fill_y.set_name(fill_y);
 
-Step concatenate(concat, fill_x, fill_y);
+Task concatenate(concat, fill_x, fill_y);
 concatenate.set_name(concatenate);
 
-Step reduction(reduce, concatenate);
+Task reduction(reduce, concatenate);
 reduction.set_name(reduction);
 
-reduction.graph(std :: cout, pipeline_name);
+reduction.graphviz(std :: cout, pipeline_name);
 ```
 
-We set a name to each step (the default value is just `Step`).
+We set a name to each step (the default value is just `Task`).
 
 The work-flow can be summarized as:
 
@@ -242,10 +242,10 @@ auto prod = [&](float * x)
 
 auto a = InputVariable(N);
 
-Step init_step(init, a);
-Step fill_step(fill, init_step);
-Step sum_step(sum, fill_step);
-Step prod_step(prod, fill_step);
+Task init_step(init, a);
+Task fill_step(fill, init_step);
+Task sum_step(sum, fill_step);
+Task prod_step(prod, fill_step);
 
 auto result = sum_step();
 std :: cout << "Summation result: " << result << std :: endl;
@@ -283,36 +283,36 @@ auto n_class = InputVariable < int >();
 n_class.set_name(Nclass);
 
 // Compute the unique classes
-Step classes(get_classes, yt, yp, n_labels, n_labels);
+Task classes(get_classes, yt, yp, n_labels, n_labels);
 classes.set_name(classes);
 
 // set the Nclass as step for printing
 n_class.set(Nclass);
 
 // Compute the confusion matrix
-Step confusion_matrix(get_confusion_matrix, yt, yp, n_labels,
+Task confusion_matrix(get_confusion_matrix, yt, yp, n_labels,
                       classes, n_class);
 confusion_matrix.set_name(confusion_matrix);
 
 // Compute the True Positive
-Step TP(get_TP, confusion_matrix, n_class);
+Task TP(get_TP, confusion_matrix, n_class);
 TP.set_name(TP);
 // Compute the False Positive
-Step FP(get_FP, confusion_matrix, n_class);
+Task FP(get_FP, confusion_matrix, n_class);
 FP.set_name(FP);
 // Compute the False Negative
-Step FN(get_FN, confusion_matrix, n_class);
+Task FN(get_FN, confusion_matrix, n_class);
 FN.set_name(FN);
 
 // Compute the Test outcome positive
-Step TOP(get_TOP, TP, FP, n_class);
+Task TOP(get_TOP, TP, FP, n_class);
 TOP.set_name(TOP);
 // Compute the Condition positive or support
-Step P(get_P, TP, FN, n_class);
+Task P(get_P, TP, FN, n_class);
 P.set_name(P);
 
 // Compute the Matthews Correlation Coefficient
-Step MCC(get_overall_MCC, confusion_matrix, TOP, P, n_class);
+Task MCC(get_overall_MCC, confusion_matrix, TOP, P, n_class);
 MCC.set_name(MCC);
 
 auto res = MCC();
@@ -322,7 +322,7 @@ std :: cout << "Matthews Correlation Coefficient: " << res << std :: endl;
 
 ### Useful API
 
-The [helper.h](https://github.com/Nico-Curti/easyDAG/blob/master/include/helper.h) and [utils.h](https://github.com/Nico-Curti/easyDAG/blob/master/include/utils.h) scripts include some useful APIs to manage `Step` variables.
+The [helper.h](https://github.com/Nico-Curti/easyDAG/blob/master/include/helper.h) and [utils.h](https://github.com/Nico-Curti/easyDAG/blob/master/include/utils.h) scripts include some useful APIs to manage `Task` variables.
 
 First of all you can check the type of the current variable with
 

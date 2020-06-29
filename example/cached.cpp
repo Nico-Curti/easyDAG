@@ -1,5 +1,5 @@
 /****************** CACHED EXAMPLE *****************/
-// Last update: 15/06/2020
+// Last update: 29/06/2020
 //
 // In this example we verify the cached values.
 // If the DAG has been already evaluated its dependencies
@@ -9,7 +9,7 @@
 //
 /***************************************************/
 
-#include <step.hpp>
+#include <task.hpp>
 
 #include <numeric>
 #include <cassert>
@@ -47,10 +47,10 @@ int main ()
 
   auto a = InputVariable(N);
 
-  Step init_step(init, a);
-  Step fill_step(fill, init_step);
-  Step sum_step(sum, fill_step);
-  Step prod_step(prod, fill_step);
+  Task init_step(init, a);
+  Task fill_step(fill, init_step);
+  Task sum_step(sum, fill_step);
+  Task prod_step(prod, fill_step);
 
   auto result = sum_step();
 

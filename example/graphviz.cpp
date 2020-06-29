@@ -1,10 +1,10 @@
-/****************** GRAPH EXAMPLE *****************/
-// Last update: 15/06/2020
+/***************** GRAPHVIZ EXAMPLE ***************/
+// Last update: 29/06/2020
 //
 // In this example we show how you can use easyDAG to
 // visualize your DAG scheme using DOT.
 // We set a name to each step (the default value is
-// just "Step").
+// just "Task").
 // In the example we create two vectors starting
 // from just a dimension size; we fill the two
 // vectors; we concatenate them and we apply a
@@ -17,7 +17,7 @@
 //
 /***************************************************/
 
-#include <step.hpp>
+#include <task.hpp>
 
 #include <numeric>
 #include <cassert>
@@ -58,25 +58,25 @@ int main ()
   auto size = InputVariable(N);
   size.set_name(size);
 
-  Step init_x(init, size);
-  Step init_y(init, size);
+  Task init_x(init, size);
+  Task init_y(init, size);
 
   init_x.set_name(init_x);
   init_y.set_name(init_y);
 
-  Step fill_x(fill, init_x);
-  Step fill_y(fill, init_y);
+  Task fill_x(fill, init_x);
+  Task fill_y(fill, init_y);
 
   fill_x.set_name(fill_x);
   fill_y.set_name(fill_y);
 
-  Step concatenate(concat, fill_x, fill_y);
+  Task concatenate(concat, fill_x, fill_y);
   concatenate.set_name(concatenate);
 
-  Step reduction(reduce, concatenate);
+  Task reduction(reduce, concatenate);
   reduction.set_name(reduction);
 
-  reduction.graph(std :: cout, pipeline_name);
+  reduction.graphviz(std :: cout, pipeline_name);
 
   assert ( reduction() == N * 2 );
 

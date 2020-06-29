@@ -2,7 +2,6 @@
 #define __step_h__
 
 #include <tuple>
-#include <future>
 #include <string>
 #include <utility>
 #include <iostream>
@@ -19,20 +18,27 @@ class Step;
 template < typename lambda, typename ... types >
 class Step
 {
-  // Private members
+
+  // Protected members
+
+protected:
 
   lambda func;
 
   std :: tuple < types ... > args;
+
+  std :: string _name;
+
+  // Private members
+  
+private:
 
   template < class type >
   static constexpr auto eval_impl (type & arg) noexcept;
 
   static constexpr auto packing (types & ... arg) noexcept;
 
-  constexpr decltype(auto) eval () noexcept;
-
-  constexpr decltype(auto) evaluate () noexcept; // "alias" of operator ()
+  constexpr decltype(auto) eval () noexcept; // "alias" of operator ()
 
   template < std :: size_t idx = 0 >
   constexpr void dump_impl (std :: ostream & os) noexcept;
@@ -91,22 +97,7 @@ public:
   friend std :: ostream & operator << (std :: ostream & os, Step < _lambda, _types ... > x);
 
   constexpr void dump (std :: ostream & os) noexcept;
-  constexpr void graph (std :: ostream & os, const std :: string & graph_name) noexcept;
-
-private:
-
-  // other Private members
-
-#if !(defined __clang__) && !(defined _MSC_VER)
-
-  using eval_t = typename std :: result_of < decltype(& Step < lambda, types ... > :: evaluate)( Step < lambda, types ... > ) > :: type;
-
-  // with a shared_future the value is automatically cached
-  std :: shared_future < eval_t > value;
-
-#endif
-
-  std :: string _name;
+  constexpr void graphviz (std :: ostream & os, const std :: string & graph_name) noexcept;
 
 };
 

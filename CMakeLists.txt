@@ -177,9 +177,9 @@ add_custom_target(example_algebra)
 add_executable(algebra ${EXAMPLE}/algebra.cpp ${HEADER} ${HPP})
 target_link_libraries(algebra ${linked_libs})# ${DAGlib})
 
-add_custom_target(example_graph)
-add_executable(graph ${EXAMPLE}/graph.cpp ${HEADER} ${HPP})
-target_link_libraries(graph ${linked_libs})# ${DAGlib})
+add_custom_target(example_graphviz)
+add_executable(graphviz ${EXAMPLE}/graphviz.cpp ${HEADER} ${HPP})
+target_link_libraries(graphviz ${linked_libs})# ${DAGlib})
 
 add_custom_target(example_cached)
 add_executable(cached ${EXAMPLE}/cached.cpp ${HEADER} ${HPP})
@@ -192,6 +192,10 @@ target_link_libraries(condition ${linked_libs})# ${DAGlib})
 add_custom_target(example_mcc)
 add_executable(mcc ${EXAMPLE}/mcc.cpp ${HEADER} ${HPP})
 target_link_libraries(mcc ${linked_libs})# ${DAGlib})
+
+add_custom_target(example_time)
+add_executable(time_monitor ${EXAMPLE}/time_monitor.cpp ${HEADER} ${HPP})
+target_link_libraries(time_monitor ${linked_libs})# ${DAGlib})
 
 #################################################################
 #                          INSTALLERS                           #
@@ -206,10 +210,11 @@ target_link_libraries(mcc ${linked_libs})# ${DAGlib})
 #                                )
 
 install(TARGETS algebra      DESTINATION ${OUT_DIR})
-install(TARGETS graph        DESTINATION ${OUT_DIR})
+install(TARGETS graphviz     DESTINATION ${OUT_DIR})
 install(TARGETS cached       DESTINATION ${OUT_DIR})
 install(TARGETS condition    DESTINATION ${OUT_DIR})
 install(TARGETS mcc          DESTINATION ${OUT_DIR})
+install(TARGETS time_monitor DESTINATION ${OUT_DIR})
 
 # #################################################################
 # #                          EXPORT DAG                          #

@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
-#include <step.hpp>
+#include <task.hpp>
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -37,15 +37,15 @@ TEST_CASE ( "Test vector concat-reduce", "[vector]" )
 
   auto a = InputVariable(N);
 
-  Step init_step_1(init, a);
-  Step init_step_2(init, a);
+  Task init_step_1(init, a);
+  Task init_step_2(init, a);
 
-  Step fill_step_1(fill, init_step_1);
-  Step fill_step_2(fill, init_step_2);
+  Task fill_step_1(fill, init_step_1);
+  Task fill_step_2(fill, init_step_2);
 
-  Step concatenate(concat, fill_step_1, fill_step_2);
+  Task concatenate(concat, fill_step_1, fill_step_2);
 
-  Step reduction(reduce, concatenate);
+  Task reduction(reduce, concatenate);
 
   REQUIRE ( reduction() == N * 2 );
 }
@@ -73,9 +73,9 @@ TEST_CASE ( "Test vector init-reduce", "[vector-init]" )
 
   auto a = InputVariable(N);
 
-  Step init_step(init, a);
-  Step fill_step(fill, init_step);
-  Step sum_step(sum, fill_step);
+  Task init_step(init, a);
+  Task fill_step(fill, init_step);
+  Task sum_step(sum, fill_step);
 
   auto res = sum_step();
 
@@ -104,9 +104,9 @@ TEST_CASE ( "Test pointer init-reduce", "[pointer-init]" )
 
   auto a = InputVariable(N);
 
-  Step init_step(init, a);
-  Step fill_step(fill, init_step);
-  Step sum_step(sum, fill_step);
+  Task init_step(init, a);
+  Task fill_step(fill, init_step);
+  Task sum_step(sum, fill_step);
 
   auto res = sum_step();
 

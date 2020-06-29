@@ -1,3 +1,20 @@
+/******************* MCC EXAMPLE ******************/
+// Last update: 29/06/2020
+//
+// In this example we show how you can use easyDAG to
+// build a more complex pipeline for the evaluation of
+// the Matthews Correlation Coefficient (MCC).
+// We create a series of function starting from the
+// implementation provided in the "scorer" project
+// (https://github.com/Nico-Curti/scorer).
+// We start from two arrays of labels (true labels and
+// predicted labels) and we create a pipeline including
+// each required step for the evaluation of the MCC
+// starting from the Confusion Matrix of the problem.
+// Please see the "scorer" project for more details.
+//
+/***************************************************/
+
 #include <set>
 #include <cmath>
 #include <vector>
@@ -6,7 +23,7 @@
 #include <iostream>
 #include <algorithm>
 
-#include <step.hpp>
+#include <task.hpp>
 
 int main ()
 {
@@ -142,7 +159,7 @@ int main ()
   n_class.set_name(Nclass);
 
   // Compute the unique classes
-  Step classes(get_classes, yt, yp, n_labels, n_labels);
+  Task classes(get_classes, yt, yp, n_labels, n_labels);
   classes.set_name(classes);
 
   // set the Nclass as step for printing
@@ -150,28 +167,28 @@ int main ()
   n_class.set(Nclass);
 
   // Compute the confusion matrix
-  Step confusion_matrix(get_confusion_matrix, yt, yp, n_labels, classes, n_class);
+  Task confusion_matrix(get_confusion_matrix, yt, yp, n_labels, classes, n_class);
   confusion_matrix.set_name(confusion_matrix);
 
   // Compute the True Positive
-  Step TP(get_TP, confusion_matrix, n_class);
+  Task TP(get_TP, confusion_matrix, n_class);
   TP.set_name(TP);
   // Compute the False Positive
-  Step FP(get_FP, confusion_matrix, n_class);
+  Task FP(get_FP, confusion_matrix, n_class);
   FP.set_name(FP);
   // Compute the False Negative
-  Step FN(get_FN, confusion_matrix, n_class);
+  Task FN(get_FN, confusion_matrix, n_class);
   FN.set_name(FN);
 
   // Compute the Test outcome positive
-  Step TOP(get_TOP, TP, FP, n_class);
+  Task TOP(get_TOP, TP, FP, n_class);
   TOP.set_name(TOP);
   // Compute the Condition positive or support
-  Step P(get_P, TP, FN, n_class);
+  Task P(get_P, TP, FN, n_class);
   P.set_name(P);
 
   // Compute the Matthews Correlation Coefficient
-  Step MCC(get_overall_MCC, confusion_matrix, TOP, P, n_class);
+  Task MCC(get_overall_MCC, confusion_matrix, TOP, P, n_class);
   MCC.set_name(MCC);
 
   auto res = MCC();
@@ -179,7 +196,7 @@ int main ()
   std :: cout << "Matthews Correlation Coefficient: " << res << std :: endl;
 
   std :: cout << std :: endl << "DOT graph:" << std :: endl;
-  MCC.graph(std :: cout, "matthews_coefficient");
+  MCC.graphviz(std :: cout, "matthews_coefficient");
 
   return 0;
 }

@@ -6,7 +6,6 @@ reset=$(tput sgr0)
 
 # $1 debug or release
 build_type=$1
-compiler=$(echo "${CXX##*/}")
 number_of_build_workers=8
 
 

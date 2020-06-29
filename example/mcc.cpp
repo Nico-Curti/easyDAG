@@ -66,13 +66,10 @@ int main ()
     auto start = classes;
     auto end   = classes + Nclass;
 
-    int i1 = 0;
-    int i2 = 0;
-
     for (int i = 0; i < n_lbl; ++i)
     {
-      i1 = std :: distance(start, std :: find(start, end, lbl_true[i]));
-      i2 = std :: distance(start, std :: find(start, end, lbl_pred[i]));
+      const int i1 = std :: distance(start, std :: find(start, end, lbl_true[i]));
+      const int i2 = std :: distance(start, std :: find(start, end, lbl_pred[i]));
       ++ confusion_matrix[i1 * Nclass + i2];
     }
     return confusion_matrix;

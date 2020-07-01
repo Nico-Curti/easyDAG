@@ -29,8 +29,11 @@ protected:
 
   std :: string _name;
 
+  template < class Func, std :: size_t idx = 0, class ... Args >
+  constexpr decltype(auto) traverse_impl (Func & func, Args && ... args) noexcept;
+
   // Private members
-  
+
 private:
 
   template < class type >
@@ -42,6 +45,7 @@ private:
 
   template < std :: size_t idx = 0 >
   constexpr void dump_impl (std :: ostream & os) noexcept;
+
 
 public:
 
@@ -60,6 +64,9 @@ public:
   constexpr void name (const std :: string & n) noexcept;
 
   // eval method
+
+  template < class Func, class ... Args >
+  constexpr decltype(auto) traverse (Func & func, Args && ... args) noexcept;
 
   constexpr decltype(auto) operator () () noexcept;
 

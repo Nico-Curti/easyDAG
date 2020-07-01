@@ -126,10 +126,31 @@ std :: ostream & operator << (std :: ostream & os, Step < lambda, types ... > x)
   if constexpr ( utils :: has_symbol < lambda > :: value )
     print < std :: tuple_size < decltype(kwargs) > :: value - 1, lambda :: symbol() > (os, kwargs);
   else
-    print < std :: tuple_size < decltype(kwargs) > :: value - 1, ' ' > (os, kwargs);
+    print < std :: tuple_size < decltype(kwargs) > :: value - 1, ',' > (os, kwargs);
 
   os << ")";
   return os;
+}
+
+template < typename lambda, typename ... types > template < class Func, std :: size_t idx, class ... Args >
+constexpr decltype(auto) Step < lambda, types ... > :: traverse_impl (Func & func, Args && ... args) noexcept
+{
+  if constexpr (idx + 1 < sizeof ... (types))
+    this->traverse_impl < Func, idx + 1 > (func, args ...);
+
+  using idx_t = utils :: nth_type_of < idx, types ... >;
+
+  if constexpr ( utils :: is_step < idx_t > :: value ) // it is a step
+    return std :: get < idx >(this->args).traverse (func, args ...);
+
+  else if constexpr ( utils :: is_variable < idx_t > :: value ) // it is a variable
+    return func (std :: get < idx >(this->args), args ...);
+}
+
+template < typename lambda, typename ... types > template < class Func, class ... Args >
+constexpr decltype(auto) Step < lambda, types ... > :: traverse (Func & func, Args && ... args) noexcept
+{
+  return this->traverse_impl < Func, 0 >(func, args ...);
 }
 
 template < typename lambda, typename ... types > template < std :: size_t idx >

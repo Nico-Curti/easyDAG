@@ -391,6 +391,7 @@ See [here](https://github.com/Nico-Curti/easyDAG/blob/master/CONTRIBUTING.md) fo
 ## References
 
 * [easyDAG](https://github.com/eDIMESLab/easyDAG): easyDAG Python version.
+* [taskflow](https://github.com/taskflow/taskflow): modern C++ Parallel Task Programming
 
 ## Authors
 
@@ -412,7 +413,7 @@ Thanks goes to all contributors of this project.
 
 If you have found `easyDAG` helpful in your research, please consider citing this project repository
 
-```tex
+```BibTeX
 @misc{easyDAG,
   author = {Curti, Nico and Giampieri, Enrico},
   title = {Easy DAG in C++},

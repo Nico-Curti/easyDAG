@@ -17,7 +17,8 @@ add_definitions (-DMAJOR=${DAG_MAJOR} -DMINOR=${DAG_MINOR} -DREVISION=${DAG_REVI
 #                         COMPILE OPTIONS                       #
 #################################################################
 
-option (BUILD_TEST "Enable tests build           support" ON)
+option (BUILD_TEST      "Enable tests build           support" ON)
+option (BUILD_BENCHMARK "Enable benchmark build       support" OFF)
 
 #################################################################
 #                         SETTING VARIABLES                     #
@@ -108,6 +109,7 @@ set(INC_DIR  ${CMAKE_SOURCE_DIR}/include                             CACHE PATH 
 set(HPP_DIR  ${CMAKE_SOURCE_DIR}/hpp                                 CACHE PATH "Path where find hpp files"                        )
 set(EXAMPLE  ${CMAKE_SOURCE_DIR}/example                             CACHE PATH "Path where find main files"                       )
 set(TEST_DIR ${CMAKE_SOURCE_DIR}/test                                CACHE PATH "Path where find test files"                       )
+set(BENC_DIR ${CMAKE_SOURCE_DIR}/benchmark                           CACHE PATH "Path where find benchmark files"                  )
 set(LIB_DIR  ${CMAKE_SOURCE_DIR}/lib                                 CACHE PATH "Path where lib will be installed"            FORCE)
 set(INST_DIR ${CMAKE_SOURCE_DIR}/share/dag                           CACHE PATH "Path where cmake configs will be installed"  FORCE)
 set(OUT_DIR  ${CMAKE_SOURCE_DIR}/bin                                 CACHE PATH "Path where outputs will be installed"        FORCE)
@@ -157,7 +159,8 @@ foreach(FLAG ${linked_libs})
   message(STATUS "                    * ${FLAG}"                                     )
 endforeach(FLAG)
 message(STATUS ""                                                                    )
-message(STATUS "   BUILD_TEST     : ${BUILD_TEST}"                                   )
+message(STATUS "   BUILD_TEST      : ${BUILD_TEST}"                                  )
+message(STATUS "   BUILD_BENCHMARK : ${BUILD_BENCHMARK}"                             )
 message(STATUS ""                                                                    )
 
 
@@ -171,7 +174,11 @@ message(STATUS ""                                                               
 
 if (BUILD_TEST)
   add_subdirectory(${TEST_DIR})
-endif()
+endif ()
+
+if (BUILD_BENCHMARK)
+  add_subdirectory(${BENC_DIR})
+endif ()
 
 add_custom_target(example_algebra)
 add_executable(algebra ${EXAMPLE}/algebra.cpp ${HEADER} ${HPP})

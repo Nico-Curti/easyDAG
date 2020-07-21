@@ -10,12 +10,13 @@
   #define NUM 10
 #endif
 
+#define size 100
+
 
 int main ()
 {
 
   std :: size_t num_threads = 4;
-  constexpr std :: size_t size = 100;
 
   timeit < NREP, NUM > timer;
 

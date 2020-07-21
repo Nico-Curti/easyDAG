@@ -1,5 +1,4 @@
 #include <binary_tree.h>
-#include <omp.h>
 
 void binary_tree_omp (const std :: size_t & num_layers, const unsigned & num_threads)
 {

@@ -124,6 +124,14 @@ file(GLOB SCORER_HEADER "${INC_SCORER}/*.h")
 
 include_directories(${INC_DIR} ${HPP_DIR} ${TEST_DIR})
 
+if (BUILD_TEST)
+  add_subdirectory(${TEST_DIR})
+endif ()
+
+if (BUILD_BENCHMARK)
+  add_subdirectory(${BENC_DIR})
+endif ()
+
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 string (REPLACE " " ";" CMAKE_CXX_FLAGS_LIST ${CMAKE_CXX_FLAGS})
@@ -171,14 +179,6 @@ message(STATUS ""                                                               
 # add_library(${DAGlib} SHARED ${SRC} ${HEADER} ${HPP})
 # set_property(TARGET ${DAGlib} PROPERTY POSITION_INDEPENDENT_CODE ON)
 # target_link_libraries(${DAGlib} ${linked_libs})
-
-if (BUILD_TEST)
-  add_subdirectory(${TEST_DIR})
-endif ()
-
-if (BUILD_BENCHMARK)
-  add_subdirectory(${BENC_DIR})
-endif ()
 
 add_custom_target(example_algebra)
 add_executable(algebra ${EXAMPLE}/algebra.cpp ${HEADER} ${HPP})

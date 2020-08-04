@@ -176,10 +176,6 @@ message(STATUS ""                                                               
 #                         MAIN RULES                            #
 #################################################################
 
-# add_library(${DAGlib} SHARED ${SRC} ${HEADER} ${HPP})
-# set_property(TARGET ${DAGlib} PROPERTY POSITION_INDEPENDENT_CODE ON)
-# target_link_libraries(${DAGlib} ${linked_libs})
-
 add_custom_target(example_algebra)
 add_executable(algebra ${EXAMPLE}/algebra.cpp ${HEADER} ${HPP})
 target_link_libraries(algebra ${linked_libs})# ${DAGlib})
@@ -208,50 +204,9 @@ target_link_libraries(time_monitor ${linked_libs})# ${DAGlib})
 #                          INSTALLERS                           #
 #################################################################
 
-# install(TARGETS ${DAGlib}      EXPORT DAGTargets
-#                                RUNTIME DESTINATION ${OUT_DIR}
-#                                LIBRARY DESTINATION ${LIB_DIR}
-#                                ARCHIVE DESTINATION ${LIB_DIR}
-#                                PUBLIC_HEADER DESTINATION ${LIB_DIR}/include
-#                                COMPONENT dev
-#                                )
-
 install(TARGETS algebra      DESTINATION ${OUT_DIR})
 install(TARGETS graphviz     DESTINATION ${OUT_DIR})
 install(TARGETS cached       DESTINATION ${OUT_DIR})
 install(TARGETS condition    DESTINATION ${OUT_DIR})
 install(TARGETS mcc          DESTINATION ${OUT_DIR})
 install(TARGETS time_monitor DESTINATION ${OUT_DIR})
-
-# #################################################################
-# #                          EXPORT DAG                          #
-# #################################################################
-#
-# install (EXPORT DAGTargets
-#          FILE DAGTargets.cmake
-#          NAMESPACE DAG::
-#          DESTINATION "${INST_DIR}"
-#         )
-#
-# # Export the package for use from the build-tree (this registers the build-tree with a global CMake-registry)
-# export (PACKAGE DAG)
-#
-# # Create the DAGConfig.cmake
-# # First of all we compute the relative path between the cmake config file and the include path
-# file (RELATIVE_PATH REL_INCLUDE_DIR "${INST_DIR}" "${LIB_DIR}/include")
-# set (CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}")
-# configure_file (DAGConfig.cmake.in "${PROJECT_BINARY_DIR}/DAGConfig.cmake" @ONLY)
-# set (CONF_INCLUDE_DIRS "\${DAG_CMAKE_DIR}/${REL_INCLUDE_DIR}")
-# configure_file (DAGConfig.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/DAGConfig.cmake" @ONLY)
-#
-# # Create the DAGConfigVersion.cmake
-# include(CMakePackageConfigHelpers)
-# write_basic_package_version_file ("${PROJECT_BINARY_DIR}/DAGConfigVersion.cmake"
-#                                   COMPATIBILITY SameMajorVersion
-#                                  )
-#
-# install (FILES
-#          "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/DAGConfig.cmake"
-#          "${PROJECT_BINARY_DIR}/DAGConfigVersion.cmake"
-#          DESTINATION "${INST_DIR}"
-#          )

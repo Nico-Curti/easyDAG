@@ -1,5 +1,5 @@
 /***************** TIMER EXAMPLE ******************/
-// Last update: 29/06/2020
+// Last update: 13/08/2020
 //
 // In this example we show how you can use easyDAG to
 // inherit from the Task class obtaining an object able
@@ -7,7 +7,7 @@
 //
 /***************************************************/
 
-#include <task.hpp>
+#include <easyDAG.hpp>
 #include <chrono>
 #include <thread>
 #include <sstream>
@@ -114,6 +114,8 @@ int main ()
   add_2.set_name(add_2);
   Monitor mul(mul_lambda, add_1, add_2);
   mul.set_name(mul);
+
+  mul.eval();
 
   std :: cout << "Result: " << mul() << std :: endl;
   std :: cout << "Elapsed time: " << mul.elapsed() << " ms" << std :: endl;

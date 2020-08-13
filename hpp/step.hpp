@@ -188,7 +188,7 @@ constexpr void Step < lambda, types ... > :: graphviz (std :: ostream & os, cons
 }
 
 template < typename lambda, typename ... types >
-constexpr Step < lambda, types ... > make_step (lambda & func, types & ... args) noexcept
+constexpr Step < lambda, types ... > make_step (lambda & func, types ... args) noexcept
 {
   return Step < lambda, types ... >(func, args ...);
 }

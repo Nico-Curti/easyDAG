@@ -2,7 +2,7 @@
 #include <catch.hpp>
 #include <sstream>
 
-#include <task.hpp>
+#include <easyDAG.hpp>
 
 
 TEST_CASE ( "Test is_type", "[is_type]" )

@@ -32,7 +32,7 @@ namespace utils
 
       static constexpr std :: false_type test (...);
 
-      using type = decltype( test (std :: declval < derived * >() ) );
+      using type = decltype( test (std :: declval < std :: remove_cv_t < std :: remove_reference_t < derived > > * >() ) );
     };
   }
 
@@ -98,7 +98,7 @@ namespace utils
   struct is_step < T, booltype < is_step_instance < T, Step > :: value > >
   {
     // a variable is a step with a lambda function different from math :: Input
-    static constexpr bool value = !std :: is_same < typename T :: lambda_func, decltype(math :: Input) > :: value;
+    static constexpr bool value = !std :: is_same < typename std :: remove_cv_t < std :: remove_reference_t < T > > :: lambda_func, decltype(math :: Input) > :: value;
   };
 
   // useful alias
@@ -243,6 +243,50 @@ namespace utils
     // static constexpr int num_cached = 0;
   };
 
+}
+
+namespace detail
+{
+  template < class, class >
+  struct join_tuples
+  {};
+
+  template < class ... left, class ... right >
+  struct join_tuples < std :: tuple < left ... >, std :: tuple < right ... > >
+  {
+    using type = std :: tuple < left ..., right ... >;
+  };
+
+  template < class T, std :: size_t N >
+  struct generate_tuple_type
+  {
+    using left  = typename generate_tuple_type < T, N / 2 > :: type;
+    using right = typename generate_tuple_type < T, N / 2 + N % 2> :: type;
+    using type  = typename join_tuples < left, right > :: type;
+  };
+
+  template < class T >
+  struct generate_tuple_type < T, 1 >
+  {
+    using type = std :: tuple < T >;
+  };
+
+  template < class T >
+  struct generate_tuple_type < T, 0 >
+  {
+    using type = std :: tuple < >;
+  };
+
+
+  template < std :: size_t n, class return_t, class ... Args >
+  constexpr decltype(auto) make_n_tuple (Args ... args) noexcept
+  {
+    if constexpr (n > 0)
+      return std :: tuple_cat(std :: make_tuple(return_t(args ...)), make_n_tuple < n - 1, return_t, Args ... >(args ...));
+
+    else
+      return std :: make_tuple(return_t(args ...));
+  }
 }
 
 

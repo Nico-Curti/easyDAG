@@ -8,16 +8,19 @@
 
 // class specialization with async tasks
 template < typename lambda, typename ... types >
-class Task : public Step < lambda, types ...>
+class Task : public Step < lambda, types ... >
 {
 
   // Private members
 
-  using eval_t = typename std :: result_of < decltype(& Step < lambda, types ... > :: operator ())( Step < lambda, types ... > ) > :: type;
-
 protected:
 
   // Protected members
+
+  using eval_t = typename std :: result_of < decltype(& Step < lambda, types ... > :: operator ())( Step < lambda, types ... > ) > :: type;
+
+  template < std :: size_t idx >
+  constexpr void eval_impl () noexcept;
 
   template < std :: size_t indent, std :: size_t idx >
   constexpr void graph_impl (std :: ostream & os) noexcept;
@@ -38,6 +41,9 @@ public:
   // eval method
 
   constexpr decltype(auto) operator () () noexcept;
+  constexpr void eval () noexcept;
+
+  constexpr bool is_valuable () noexcept;
 
   // IO operator
 
@@ -48,6 +54,6 @@ public:
 
 // This is the CTAD workaround for std <= 14
 template < typename lambda, typename ... types >
-constexpr Task < lambda, types ... > make_task (lambda & func, types & ... args) noexcept;
+constexpr Task < lambda, types ... > make_task (lambda & func, types ... args) noexcept;
 
 #endif // __task_h__

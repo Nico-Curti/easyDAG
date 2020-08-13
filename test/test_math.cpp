@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
-#include <task.hpp>
+#include <easyDAG.hpp>
 
 
 TEST_CASE ( "Test get variable", "[get]" )
@@ -39,10 +39,21 @@ TEST_CASE ( "Test simple step", "[step]" )
   float x = 3.14f;
 
   Task Double(lambda, x);
+  Double.eval();
 
   REQUIRE ( Double() == x * 2.f );
 }
 
+TEST_CASE ( "Test not valuable step", "[step]" )
+{
+  auto lambda = [](const float & var){return var * 2.f;};
+
+  float x = 3.14f;
+
+  Task Double(lambda, x);
+
+  REQUIRE ( Double.is_valuable() == false );
+}
 
 TEST_CASE ( "Test add step", "[add]" )
 {
@@ -53,6 +64,7 @@ TEST_CASE ( "Test add step", "[add]" )
   auto b = InputVariable(y);
 
   Task add(math :: Add_lambda, a, b);
+  add.eval();
 
   REQUIRE ( add() == 45.14f );
 }
@@ -69,6 +81,7 @@ TEST_CASE ( "Test add step set", "[add_set]" )
   b.set(y);
 
   Task add(math :: Add_lambda, a, b);
+  add.eval();
 
   REQUIRE ( a()   == x );
   REQUIRE ( b()   == y );
@@ -101,6 +114,7 @@ TEST_CASE ( "Test add & mul step", "[add_mul]" )
   Task add_1(math :: Add_lambda, a, b);
   Task add_2(math :: Add_lambda, c, d);
   Task mul_1(math :: Mul_lambda, add_1, add_2);
+  mul_1.eval();
 
   REQUIRE ( mul_1() == 21.f );
 }

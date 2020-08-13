@@ -1,5 +1,5 @@
 /***************** GRAPHVIZ EXAMPLE ***************/
-// Last update: 29/06/2020
+// Last update: 13/08/2020
 //
 // In this example we show how you can use easyDAG to
 // visualize your DAG scheme using DOT.
@@ -17,7 +17,7 @@
 //
 /***************************************************/
 
-#include <task.hpp>
+#include <easyDAG.hpp>
 
 #include <numeric>
 #include <cassert>
@@ -77,6 +77,7 @@ int main ()
   reduction.set_name(reduction);
 
   reduction.graphviz(std :: cout, pipeline_name);
+  reduction.eval();
 
   assert ( reduction() == N * 2 );
 

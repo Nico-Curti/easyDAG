@@ -1,5 +1,5 @@
 /***************** ALGEBRA EXAMPLE *****************/
-// Last update: 29/06/2020
+// Last update: 13/08/2020
 //
 // In this example we show how you can use easyDAG to
 // perform a simple math operation.
@@ -13,7 +13,7 @@
 //
 /***************************************************/
 
-#include <task.hpp>
+#include <easyDAG.hpp>
 
 #include <cassert>
 #include <iostream>
@@ -37,6 +37,8 @@ int main ()
   Task mul(math :: Mul_lambda, add_1, add_2);     //           |___ add_2 +
                                                   //                      |____ d
   std :: cout << mul << std :: endl;              //
+
+  mul.eval();
 
   auto result = mul ();
   assert ( result == 21.f );

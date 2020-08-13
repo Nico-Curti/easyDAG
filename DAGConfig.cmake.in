@@ -1,17 +1,24 @@
-# Config file for the rFBP package
-# It defines the following variables
-#  DAG_INCLUDE_DIRS - include directories for rFBP
-#  DAG_LIBRARIES    - libraries to link against
+# Config file for the easyDAG package
 
-# Compute paths
 get_filename_component(DAG_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-set(DAG_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
 list(APPEND CMAKE_MODULE_PATH "${DAG_CMAKE_DIR}")
 
 include(CMakeFindDependencyMacro)
 
+set(CMAKE_THREAD_PREFER_PTHREAD ON)
+find_dependency(Threads)
+
+if(MSVC)
+  find_dependency(PThreads_windows)
+  set(CMAKE_CXX_FLAGS "/wd4018 /wd4244 /wd4267 /wd4305 ${CMAKE_CXX_FLAGS}")
+endif()
+
 # Our library dependencies (contains definitions for IMPORTED targets)
 include("${DAG_CMAKE_DIR}/DAGTargets.cmake")
+include("${DAG_CMAKE_DIR}/DAGConfigVersion.cmake")
 
-# These are IMPORTED targets created by DAGTargets.cmake
-set(DAG_LIBRARIES DAGlib)
+get_target_property(FULL_DAG_INCLUDE_DIRS DAG::@DAGlib@ INTERFACE_INCLUDE_DIRECTORIES)
+list(GET FULL_DAG_INCLUDE_DIRS 0 DAG_INCLUDE_DIR)
+get_filename_component(DAG_INCLUDE_DIR "${DAG_INCLUDE_DIR}" REALPATH)
+
+find_package_handle_standard_args(DAG REQUIRED_VARS DAG_INCLUDE_DIR VERSION_VAR PACKAGE_VERSION)

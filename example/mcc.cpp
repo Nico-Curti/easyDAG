@@ -1,5 +1,5 @@
 /******************* MCC EXAMPLE ******************/
-// Last update: 29/06/2020
+// Last update: 13/08/2020
 //
 // In this example we show how you can use easyDAG to
 // build a more complex pipeline for the evaluation of
@@ -23,7 +23,7 @@
 #include <iostream>
 #include <algorithm>
 
-#include <task.hpp>
+#include <easyDAG.hpp>
 
 int main ()
 {
@@ -160,6 +160,7 @@ int main ()
   classes.set_name(classes);
 
   // set the Nclass as step for printing
+  classes.eval();
   classes();
   n_class.set(Nclass);
 
@@ -187,6 +188,8 @@ int main ()
   // Compute the Matthews Correlation Coefficient
   Task MCC(get_overall_MCC, confusion_matrix, TOP, P, n_class);
   MCC.set_name(MCC);
+
+  MCC.eval();
 
   auto res = MCC();
 

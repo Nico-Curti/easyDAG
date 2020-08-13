@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
-#include <task.hpp>
+#include <easyDAG.hpp>
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -46,6 +46,7 @@ TEST_CASE ( "Test vector concat-reduce", "[vector]" )
   Task concatenate(concat, fill_step_1, fill_step_2);
 
   Task reduction(reduce, concatenate);
+  reduction.eval();
 
   REQUIRE ( reduction() == N * 2 );
 }
@@ -76,6 +77,7 @@ TEST_CASE ( "Test vector init-reduce", "[vector-init]" )
   Task init_step(init, a);
   Task fill_step(fill, init_step);
   Task sum_step(sum, fill_step);
+  sum_step.eval();
 
   auto res = sum_step();
 
@@ -107,8 +109,50 @@ TEST_CASE ( "Test pointer init-reduce", "[pointer-init]" )
   Task init_step(init, a);
   Task fill_step(fill, init_step);
   Task sum_step(sum, fill_step);
+  sum_step.eval();
 
   auto res = sum_step();
 
   REQUIRE ( res == N );
+}
+
+
+template < typename T, size_t ... Is >
+auto sum_components_impl (T const & t, std :: index_sequence < Is ... >)
+{
+  return (std :: get < Is >(t) + ...);
+}
+
+
+TEST_CASE ( "Test n-task dot", "[n-task-dot]" )
+{
+  constexpr std :: size_t length = 10;
+  std :: size_t idx = -1;
+
+  float * x = new float[length];
+  float * y = new float[length];
+
+  std :: fill_n(x, length, 1.f);
+  std :: fill_n(y, length, 1.f);
+
+  auto dot = [&](float * x, float * y)
+             {
+               ++idx;
+               return x[idx] * y[idx];
+             };
+
+  NTask < length, decltype(dot), decltype(x), decltype(y) > prod (dot, x, y);
+
+  using tuple_type = typename decltype(prod) :: res_tuple_type;
+
+  auto acc = [](const tuple_type & x)
+             {
+               return sum_components_impl(x, std :: make_index_sequence < length > {});
+             };
+
+  Task sum = make_task(acc, prod);
+
+  sum.eval();
+
+  REQUIRE ( sum() == length );
 }

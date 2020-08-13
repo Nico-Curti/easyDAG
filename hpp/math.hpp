@@ -177,6 +177,15 @@ struct
 
 } Lower_lambda;
 
+struct
+{
+  template < typename type >
+  type operator () (type first)
+  {
+    return first;
+  }
+
+} Get;
 
 } // end namespace
 

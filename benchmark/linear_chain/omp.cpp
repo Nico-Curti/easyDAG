@@ -1,5 +1,4 @@
 #include <linear_chain.h>
-#include <omp.h>
 
 void linear_chain_omp (const std :: size_t & length, const unsigned & num_threads)
 {

@@ -1,5 +1,5 @@
 /****************** CACHED EXAMPLE *****************/
-// Last update: 29/06/2020
+// Last update: 13/08/2020
 //
 // In this example we verify the cached values.
 // If the DAG has been already evaluated its dependencies
@@ -9,7 +9,7 @@
 //
 /***************************************************/
 
-#include <task.hpp>
+#include <easyDAG.hpp>
 
 #include <numeric>
 #include <cassert>
@@ -51,6 +51,9 @@ int main ()
   Task fill_step(fill, init_step);
   Task sum_step(sum, fill_step);
   Task prod_step(prod, fill_step);
+
+  sum_step.eval();
+  prod_step.eval();
 
   auto result = sum_step();
 

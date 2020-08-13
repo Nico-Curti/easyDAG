@@ -1,6 +1,5 @@
 #include <binary_tree.h>
-#include <task.hpp>
-#include <memory>
+#include <easyDAG.hpp>
 
 
 template < int N, class L, class R, typename std :: enable_if < (N > 0) > :: type * >
@@ -19,10 +18,11 @@ template < int num_layers >
 void binary_tree_task ()
 {
   std :: size_t one = 1;
-  auto var_left  = make_task(math :: Input, one);
-  auto var_right = make_task(math :: Input, one);
+  auto var_left  = InputVariable(one); // it must be a step otherwise a inputvariable-task is not valuable
+  auto var_right = InputVariable(one); // it must be a step otherwise a inputvariable-task is not valuable
 
   auto tree = make_tree < num_layers - 1 >(var_left, var_right);
+  tree.eval();
 
   // in release the asserts are turned off
   if ( tree() != (1 << num_layers) )

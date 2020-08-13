@@ -3,9 +3,18 @@ find_package (OpenMP REQUIRED)
 
 if (OPENMP_FOUND)
   message (STATUS "OpenMP found")
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-  if (APPLE)
-    list (APPEND linked_libs OpenMP::OpenMP_CXX)
+
+  if ("${OpenMP_CXX_VERSION_MAJOR}" STREQUAL "")
+    message (FATAL_ERROR " Cannot detect the current OpenMP version. Probably there are some troubles in the installation or in its support")
+  endif ()
+  
+  if (OpenMP_CXX_VERSION_MAJOR LESS_EQUAL 4)
+     message (FATAL_ERROR " Your OpenMP is too old. Required OpenMP 4.0. Please upgrade.")
+  else ()
+	  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+	  if (APPLE)
+	    list (APPEND linked_libs OpenMP::OpenMP_CXX)
+	  endif ()
   endif ()
 endif ()
 

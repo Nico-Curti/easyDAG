@@ -145,7 +145,7 @@ TEST_CASE ( "Test n-task dot", "[n-task-dot]" )
 
   using tuple_type = typename decltype(prod) :: res_tuple_type;
 
-  auto acc = [](const tuple_type & x)
+  auto acc = [&](const tuple_type & x)
              {
                return sum_components_impl(x, std :: make_index_sequence < length > {});
              };

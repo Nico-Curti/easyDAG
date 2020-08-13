@@ -117,23 +117,16 @@ TEST_CASE ( "Test pointer init-reduce", "[pointer-init]" )
 }
 
 
-template < typename T, size_t ... Is >
-auto sum_components_impl (T const & t, std :: index_sequence < Is ... >)
-{
-  return (std :: get < Is >(t) + ...);
-}
-
-
 TEST_CASE ( "Test n-task dot", "[n-task-dot]" )
 {
-  constexpr std :: size_t length = 10;
+  constexpr std :: size_t length = 5;
   std :: size_t idx = -1;
 
   float * x = new float[length];
   float * y = new float[length];
 
-  std :: fill_n(x, length, 1.f);
-  std :: fill_n(y, length, 1.f);
+  std :: iota(x, x + length, 1.f);
+  std :: iota(y, y + length, 1.f);
 
   auto dot = [&](float * x, float * y)
              {
@@ -145,14 +138,14 @@ TEST_CASE ( "Test n-task dot", "[n-task-dot]" )
 
   using tuple_type = typename decltype(prod) :: res_tuple_type;
 
-  auto acc = [&](const tuple_type & x)
-             {
-               return sum_components_impl(x, std :: make_index_sequence < length > {});
-             };
+  prod.eval();
+  auto res = prod();
 
-  Task sum = make_task(acc, prod);
+  static_assert(std :: is_same_v < tuple_type, std :: tuple < float, float, float, float, float > >, "It is a 5-float-tuple");
 
-  sum.eval();
-
-  REQUIRE ( sum() == length );
+  REQUIRE ( std :: get < 0 >(res) == 1.f );
+  REQUIRE ( std :: get < 1 >(res) == 4.f );
+  REQUIRE ( std :: get < 2 >(res) == 9.f );
+  REQUIRE ( std :: get < 3 >(res) == 16.f );
+  REQUIRE ( std :: get < 4 >(res) == 25.f );
 }
